@@ -8,4 +8,6 @@ sealed class SignUpResponse {
 
     data object AccountExist : SignUpResponse()
 
+    data object UnknownException : SignUpResponse()
+
 }

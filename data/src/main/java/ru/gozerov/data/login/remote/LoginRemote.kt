@@ -1,12 +1,12 @@
 package ru.gozerov.data.login.remote
 
-import ru.gozerov.data.login.remote.models.LoginResponseBody
-import ru.gozerov.data.login.remote.models.SignUpResponseBody
+import ru.gozerov.data.login.remote.models.SuccessLoginResponseBody
+import ru.gozerov.data.login.remote.models.SuccessSignUpResponseBody
 
 interface LoginRemote {
 
-    suspend fun login(username: String, password: String): LoginResponseBody
+    suspend fun login(username: String, password: String): SuccessLoginResponseBody
 
-    suspend fun register(username: String, password: String): SignUpResponseBody
+    suspend fun register(username: String, password: String): SuccessSignUpResponseBody
 
 }

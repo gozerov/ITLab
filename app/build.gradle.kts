@@ -62,7 +62,6 @@ dependencies {
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
-    implementation("com.squareup.moshi:moshi-adapters:1.15.0")
 
     //Room
     implementation("androidx.room:room-runtime:2.6.1")
