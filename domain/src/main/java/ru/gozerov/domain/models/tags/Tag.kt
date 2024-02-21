@@ -1,4 +1,6 @@
-package ru.gozerov.domain.models
+package ru.gozerov.domain.models.tags
+
+import ru.gozerov.domain.models.users.User
 
 data class Tag(
     val id: String,

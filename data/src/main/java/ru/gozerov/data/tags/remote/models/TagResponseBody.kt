@@ -1,8 +1,8 @@
 package ru.gozerov.data.tags.remote.models
 
 import com.squareup.moshi.Json
-import ru.gozerov.domain.models.Tag
-import ru.gozerov.domain.models.User
+import ru.gozerov.domain.models.tags.Tag
+import ru.gozerov.domain.models.users.User
 
 data class TagResponseBody(
     val id: String,

@@ -5,7 +5,8 @@ import dagger.Module
 @Module(
     includes = [
         AppBindModule::class,
-        RetrofitModule::class
+        RetrofitModule::class,
+        CacheModule::class
     ]
 )
 class AppModule

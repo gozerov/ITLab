@@ -8,7 +8,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import ru.gozerov.data.login.remote.LoginApi
-import ru.gozerov.itlab.utils.ApiConstants
+import ru.gozerov.data.tags.remote.TagApi
+import ru.gozerov.data.utils.ApiConstants
 import javax.inject.Singleton
 
 @Module
@@ -31,6 +32,25 @@ class RetrofitModule {
             .addConverterFactory(moshiConverterFactory)
             .build()
         return retrofit.create(LoginApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTagApi(): TagApi {
+        val moshi = Moshi.Builder()
+            .build()
+        val moshiConverterFactory = MoshiConverterFactory.create(moshi)
+        val loggingInterceptor =
+            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
+        val retrofit = Retrofit.Builder()
+            .baseUrl(ApiConstants.BASE_URL)
+            .client(client)
+            .addConverterFactory(moshiConverterFactory)
+            .build()
+        return retrofit.create(TagApi::class.java)
     }
 
 }

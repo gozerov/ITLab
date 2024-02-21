@@ -3,7 +3,6 @@ package ru.gozerov.domain.usecases
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import retrofit2.HttpException
 
@@ -21,14 +20,16 @@ abstract class UseCase<T, R> {
             val result = loadData(arg)
             _result.emit(result)
         } catch (e: HttpException) {
-            onHttpException(e)
+            onHttpError(e)
         } catch (e: Exception) {
-            onException(e)
+            onError(e)
         }
     }
 
-    protected open suspend fun onException(e: Exception) {}
+    protected open suspend fun onError(e: Exception) {}
 
-    protected open suspend fun onHttpException(e: HttpException) {}
+    protected open suspend fun onHttpError(e: HttpException) {
+        onError(e)
+    }
 
 }

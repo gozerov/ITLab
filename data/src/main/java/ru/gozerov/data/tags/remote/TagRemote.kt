@@ -1,6 +1,6 @@
 package ru.gozerov.data.tags.remote
 
-import ru.gozerov.domain.models.Tag
+import ru.gozerov.domain.models.tags.Tag
 
 interface TagRemote {
 
@@ -8,10 +8,17 @@ interface TagRemote {
 
     suspend fun createTag(latitude: Double, longitude: Double, description: String): Tag
 
-    suspend fun deleteTag(tagId: String): Boolean
+    suspend fun createTagAuthorized(
+        latitude: Double,
+        longitude: Double,
+        description: String,
+        accessToken: String
+    ): Tag
 
-    suspend fun likeTag(tagId: String): Tag
+    suspend fun deleteTagAuthorized(tagId: String, accessToken: String)
 
-    suspend fun deleteLike(tagId: String): Boolean
+    suspend fun likeTagAuthorized(tagId: String, accessToken: String): Tag
+
+    suspend fun deleteLikeAuthorized(tagId: String, accessToken: String)
 
 }

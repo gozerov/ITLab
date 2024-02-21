@@ -1,17 +1,18 @@
 package ru.gozerov.domain.repositories
 
-import ru.gozerov.domain.models.Tag
+import ru.gozerov.domain.models.tags.CreateTagData
+import ru.gozerov.domain.models.tags.Tag
 
-interface TagRepository: Repository {
+interface TagRepository : Repository {
 
     suspend fun getTags(): List<Tag>
 
-    suspend fun createTag(latitude: Double, longitude: Double, description: String): Tag
+    suspend fun createTag(createTagData: CreateTagData): Tag
 
-    suspend fun deleteTag(tagId: String): Boolean
+    suspend fun deleteTag(tagId: String)
 
     suspend fun likeTag(tagId: String): Tag
 
-    suspend fun deleteLike(tagId: String): Boolean
+    suspend fun deleteLike(tagId: String)
 
 }

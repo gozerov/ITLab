@@ -4,9 +4,8 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import ru.gozerov.domain.models.LoginRequest
+import ru.gozerov.domain.models.login.LoginData
 import ru.gozerov.domain.usecases.PerformLogin
 import ru.gozerov.domain.usecases.PerformRegister
 import ru.gozerov.itlab.app.appComponent
@@ -32,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         binding.loginButton.setOnClickListener {
             lifecycleScope.launch {
                 performLogin.execute(
-                    arg = LoginRequest("user1", "password"),
+                    arg = LoginData("user1", "password"),
                 )
                 performLogin.result.collect {
                     Log.e("AAA", it.javaClass.simpleName)
@@ -41,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         }
         binding.registerButton.setOnClickListener {
             lifecycleScope.launch {
-                performRegister.execute(LoginRequest("user52", "password"))
+                performRegister.execute(LoginData("user52", "password"))
                 performRegister.result.collect {
                     Log.e("AAA", it.javaClass.simpleName)
                 }

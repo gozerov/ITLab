@@ -1,4 +1,4 @@
-package ru.gozerov.domain.models
+package ru.gozerov.domain.models.users
 
 data class User(
     val id: String,
