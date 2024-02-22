@@ -5,7 +5,7 @@ import ru.gozerov.domain.models.login.LoginResult
 
 data class SuccessLoginResponseBody(
     @Json(name = "access_token")
-    val accessToken: String
+    val access_token: String
 ) {
     fun toLoginResponse(): LoginResult.SuccessLogin {
         return LoginResult.SuccessLogin

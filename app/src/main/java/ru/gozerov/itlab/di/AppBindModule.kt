@@ -5,6 +5,8 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ru.gozerov.data.login.LoginRepositoryImpl
+import ru.gozerov.data.login.cache.UserStorage
+import ru.gozerov.data.login.cache.UserStorageImpl
 import ru.gozerov.data.login.remote.LoginRemote
 import ru.gozerov.data.login.remote.LoginRemoteImpl
 import ru.gozerov.data.tags.TagRepositoryImpl
@@ -33,5 +35,9 @@ interface AppBindModule {
     @Binds
     @Singleton
     fun bindTagRepoImplToTagRepo(tagRepositoryImpl: TagRepositoryImpl): TagRepository
+
+    @Binds
+    @Singleton
+    fun bindUserStorageImplToUserStorage(userStorageImpl: UserStorageImpl): UserStorage
 
 }

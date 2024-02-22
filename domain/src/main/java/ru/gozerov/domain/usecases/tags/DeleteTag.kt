@@ -1,7 +1,8 @@
-package ru.gozerov.domain.usecases
+package ru.gozerov.domain.usecases.tags
 
 import ru.gozerov.domain.models.tags.DeleteTagResult
 import ru.gozerov.domain.repositories.TagRepository
+import ru.gozerov.domain.usecases.UseCase
 import javax.inject.Inject
 
 class DeleteTag @Inject constructor(

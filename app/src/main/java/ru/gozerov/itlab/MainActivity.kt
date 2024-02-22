@@ -7,8 +7,8 @@ import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.gozerov.domain.models.login.LoginData
-import ru.gozerov.domain.usecases.PerformLogin
-import ru.gozerov.domain.usecases.PerformRegister
+import ru.gozerov.domain.usecases.login.PerformLogin
+import ru.gozerov.domain.usecases.login.PerformRegister
 import ru.gozerov.itlab.databinding.ActivityMainBinding
 import javax.inject.Inject
 

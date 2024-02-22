@@ -1,4 +1,4 @@
-package ru.gozerov.domain.usecases
+package ru.gozerov.domain.usecases.login
 
 import org.json.JSONException
 import org.json.JSONObject
@@ -6,6 +6,7 @@ import retrofit2.HttpException
 import ru.gozerov.domain.models.login.LoginData
 import ru.gozerov.domain.models.login.LoginResult
 import ru.gozerov.domain.repositories.LoginRepository
+import ru.gozerov.domain.usecases.UseCase
 import javax.inject.Inject
 
 class PerformLogin @Inject constructor(
@@ -28,6 +29,7 @@ class PerformLogin @Inject constructor(
     }
 
     override suspend fun onError(e: Exception) {
+        e.printStackTrace()
         _result.emit(LoginResult.UnknownException)
     }
 
