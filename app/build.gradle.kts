@@ -70,5 +70,8 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
 
+    //MapKit
+    implementation("com.yandex.android:maps.mobile:4.4.0-lite")
+
 
 }
