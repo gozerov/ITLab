@@ -1,5 +1,6 @@
 package ru.gozerov.domain.usecases.tags
 
+import kotlinx.coroutines.flow.Flow
 import ru.gozerov.domain.models.tags.CreateTagData
 import ru.gozerov.domain.models.tags.CreateTagResult
 import ru.gozerov.domain.repositories.TagRepository
@@ -10,8 +11,8 @@ class CreateTag @Inject constructor(
     private val tagRepository: TagRepository
 ) : UseCase<CreateTagData, CreateTagResult>() {
 
-    override suspend fun loadData(arg: CreateTagData): CreateTagResult =
-        CreateTagResult.Success(tagRepository.createTag(arg))
+    override suspend fun loadData(arg: CreateTagData): Flow<CreateTagResult> =
+        tagRepository.createTag(arg)
 
 
     override suspend fun onError(e: Exception) {

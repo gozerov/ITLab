@@ -1,5 +1,6 @@
 package ru.gozerov.domain.usecases.login
 
+import kotlinx.coroutines.flow.Flow
 import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.HttpException
@@ -13,19 +14,8 @@ class PerformRegister @Inject constructor(
     private val loginRepository: LoginRepository
 ) : UseCase<LoginData, SignUpResult>() {
 
-    override suspend fun loadData(arg: LoginData): SignUpResult {
+    override suspend fun loadData(arg: LoginData): Flow<SignUpResult> {
         return loginRepository.register(arg.username, arg.password)
-    }
-
-    override suspend fun onHttpError(e: HttpException) {
-        e.response()?.errorBody()?.string()?.let {
-            try {
-                JSONObject(it).getString("detail")
-                _result.emit(SignUpResult.AccountExist)
-            } catch (e: JSONException) {
-                _result.emit(SignUpResult.UnknownException)
-            }
-        } ?: _result.emit(SignUpResult.UnknownException)
     }
 
     override suspend fun onError(e: Exception) {

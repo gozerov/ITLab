@@ -15,9 +15,9 @@ interface LoginApi {
     suspend fun login(
         @Field("username") username: String,
         @Field("password") password: String
-    ): SuccessLoginResponseBody
+    ): Result<SuccessLoginResponseBody>
 
     @POST("api/auth/register")
-    suspend fun signUp(@Body loginRequestBody: LoginRequestBody): SuccessSignUpResponseBody
+    suspend fun signUp(@Body loginRequestBody: LoginRequestBody): Result<SuccessSignUpResponseBody>
 
 }

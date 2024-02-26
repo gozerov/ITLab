@@ -49,6 +49,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
     implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.github.skydoves:retrofit-adapters-result:1.0.9")
 
     //Room
     implementation("androidx.room:room-runtime:2.6.1")

@@ -5,8 +5,8 @@ import ru.gozerov.data.login.remote.models.SuccessSignUpResponseBody
 
 interface LoginRemote {
 
-    suspend fun login(username: String, password: String): SuccessLoginResponseBody
+    suspend fun login(username: String, password: String): Result<SuccessLoginResponseBody>
 
-    suspend fun register(username: String, password: String): SuccessSignUpResponseBody
+    suspend fun register(username: String, password: String): Result<SuccessSignUpResponseBody>
 
 }

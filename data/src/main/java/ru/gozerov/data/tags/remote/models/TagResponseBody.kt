@@ -14,8 +14,4 @@ data class TagResponseBody(
     @Json(name = "is_liked")
     val isLiked: Boolean,
     val user: User?
-) {
-
-    fun toTag(): Tag = Tag(id, latitude, longitude, description, image, likes, isLiked, user)
-
-}
+)

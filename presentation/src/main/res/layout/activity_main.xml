@@ -7,10 +7,22 @@
     tools:context=".activity.MainActivity"
     android:gravity="center"
     android:orientation="vertical">
-
+<!--
     <com.yandex.mapkit.mapview.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" />-->
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:text="Login"/>
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:text="Register"/>
 
 </LinearLayout>

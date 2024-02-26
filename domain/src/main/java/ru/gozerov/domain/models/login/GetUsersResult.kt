@@ -4,10 +4,10 @@ import ru.gozerov.domain.models.users.User
 
 sealed class GetUsersResult {
 
-    data class Success(
+    class Success(
         val users: List<User>
     ): GetUsersResult()
 
-    data object Error: GetUsersResult()
+    object Error: GetUsersResult()
 
 }

@@ -1,5 +1,6 @@
 package ru.gozerov.itlab.di
 
+import com.skydoves.retrofit.adapters.result.ResultCallAdapterFactory
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -32,6 +33,7 @@ class RetrofitModule {
             .baseUrl(ApiConstants.BASE_URL)
             .client(client)
             .addConverterFactory(moshiConverterFactory)
+            .addCallAdapterFactory(ResultCallAdapterFactory.create())
             .build()
     }
 

@@ -1,14 +1,14 @@
 package ru.gozerov.domain.usecases
 
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import retrofit2.HttpException
 
 abstract class UseCase<T, R> {
 
-    protected abstract suspend fun loadData(arg: T): R
+    protected abstract suspend fun loadData(arg: T): Flow<R>
 
     protected val _result = MutableSharedFlow<R>(1, 0, BufferOverflow.DROP_OLDEST)
     val result: SharedFlow<R> = _result.asSharedFlow()
@@ -17,19 +17,15 @@ abstract class UseCase<T, R> {
         arg: T
     ) {
         try {
-            val result = loadData(arg)
-            _result.emit(result)
-        } catch (e: HttpException) {
-            onHttpError(e)
+            val res = loadData(arg)
+            res.collect {
+                _result.emit(it)
+            }
         } catch (e: Exception) {
             onError(e)
         }
     }
 
     protected open suspend fun onError(e: Exception) {}
-
-    protected open suspend fun onHttpError(e: HttpException) {
-        onError(e)
-    }
 
 }

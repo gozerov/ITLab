@@ -11,33 +11,33 @@ import ru.gozerov.data.tags.remote.models.TagResponseBody
 interface TagApi {
 
     @GET("api/tags")
-    suspend fun getTags(): List<TagResponseBody>
+    suspend fun getTags(): Result<List<TagResponseBody>>
 
     @POST("api/tags")
-    suspend fun createTag(@Body requestBody: CreateTagRequestBody): TagResponseBody
+    suspend fun createTag(@Body requestBody: CreateTagRequestBody): Result<TagResponseBody>
 
     @POST("api/tags")
     suspend fun createTagAuthorized(
         @Body requestBody: CreateTagRequestBody,
         @Header("Authorization") bearer: String
-    ): TagResponseBody
+    ): Result<TagResponseBody>
 
     @DELETE("api/tags/{tagId}")
     suspend fun deleteTagAuthorized(
         tagId: String,
         @Header("Authorization") bearer: String
-    ): String
+    ): Result<String>
 
     @POST("api/tags/{tagId}/likes")
     suspend fun likeTagAuthorized(
         tagId: String,
         @Header("Authorization") bearer: String
-    ): TagResponseBody
+    ): Result<TagResponseBody>
 
     @DELETE("api/tags/{tagId}/likes")
     suspend fun deleteLikeFromTagAuthorized(
         tagId: String,
         @Header("Authorization") bearer: String
-    ): String
+    ): Result<String>
 
 }

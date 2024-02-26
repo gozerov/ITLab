@@ -9,11 +9,11 @@ class LoginRemoteImpl @Inject constructor(
     private val loginApi: LoginApi
 ) : LoginRemote {
 
-    override suspend fun login(username: String, password: String): SuccessLoginResponseBody {
+    override suspend fun login(username: String, password: String): Result<SuccessLoginResponseBody> {
         return loginApi.login(username, password)
     }
 
-    override suspend fun register(username: String, password: String): SuccessSignUpResponseBody {
+    override suspend fun register(username: String, password: String): Result<SuccessSignUpResponseBody> {
         return loginApi.signUp(LoginRequestBody(username, password))
     }
 
