@@ -14,7 +14,9 @@ data class ITLabColors(
     val secondaryBackground: Color,
     val tintColor: Color,
     val controlColor: Color,
-    val errorColor: Color
+    val errorColor: Color,
+    val navigationBarColor: Color,
+    val actionColor: Color
 )
 
 data class ITLabTypography(

@@ -1,4 +1,4 @@
-package ru.gozerov.presentation.ui.screens.login.models
+package ru.gozerov.presentation.screens.login.models
 
 sealed class LoginIntent {
 

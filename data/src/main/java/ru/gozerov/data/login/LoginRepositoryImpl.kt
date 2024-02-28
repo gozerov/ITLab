@@ -19,6 +19,7 @@ class LoginRepositoryImpl @Inject constructor(
     override suspend fun login(username: String, password: String): Flow<LoginResult> =
         withContext(Dispatchers.IO) {
             return@withContext flow<LoginResult> {
+                emit(LoginResult.Loading)
                 val response = loginRemote.login(username, password)
                 response
                     .onSuccess {
@@ -39,6 +40,7 @@ class LoginRepositoryImpl @Inject constructor(
     override suspend fun register(username: String, password: String): Flow<SignUpResult> =
         withContext(Dispatchers.IO) {
             return@withContext flow<SignUpResult> {
+                emit(SignUpResult.Loading)
                 val response = loginRemote.register(username, password)
                 response
                     .onSuccess {

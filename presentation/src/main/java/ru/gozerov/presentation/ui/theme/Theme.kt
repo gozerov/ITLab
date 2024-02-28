@@ -1,13 +1,18 @@
 package ru.gozerov.presentation.ui.theme
 
+import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.WindowCompat
 
 @Composable
 fun ITLabTheme(
@@ -65,6 +70,21 @@ fun ITLabTheme(
         }
     )
 
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            if (darkTheme) {
+                window.statusBarColor = baseDarkPalette.primaryBackground.toArgb()
+                window.navigationBarColor = baseDarkPalette.navigationBarColor.toArgb()
+            }
+            else {
+                window.statusBarColor = baseLightPalette.primaryBackground.toArgb()
+                window.navigationBarColor = baseLightPalette.navigationBarColor.toArgb()
+            }
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+        }
+    }
     CompositionLocalProvider(
         LocalITLabColors provides colors,
         LocalITLabTypography provides typography,
