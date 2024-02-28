@@ -2,7 +2,7 @@ package ru.gozerov.presentation.screens.login.models
 
 sealed class LoginViewState {
 
-    object Empty: LoginViewState()
+    object None: LoginViewState()
 
     class Loading: LoginViewState()
 

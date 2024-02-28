@@ -45,7 +45,7 @@ fun LoginScreen(
             }
         )
         when (viewState.value) {
-            is LoginViewState.Empty -> {}
+            is LoginViewState.None -> {}
             is LoginViewState.Success -> {
                 coroutineScope.launch {
                     snackbarScopeState.showSnackbar(

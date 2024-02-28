@@ -27,9 +27,9 @@ fun ITLabTheme(
     val typography = ITLabTypography(
         heading = TextStyle(
             fontSize = when (textSize) {
-                ITLabSize.Small -> 24.sp
-                ITLabSize.Medium -> 28.sp
-                ITLabSize.Big -> 32.sp
+                ITLabSize.Small -> 16.sp
+                ITLabSize.Medium -> 18.sp
+                ITLabSize.Big -> 20.sp
             },
             fontWeight = FontWeight.Bold
         ),

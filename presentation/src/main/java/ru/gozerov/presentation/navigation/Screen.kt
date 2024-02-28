@@ -8,6 +8,7 @@ sealed class Screen(
     @DrawableRes val icon: Int? = null
 ) {
     object Login : Screen("login")
+    object ChooseAccount : Screen("choose_account")
 }
 
 /*

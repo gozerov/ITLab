@@ -23,7 +23,7 @@ class LoginViewModel @Inject constructor(
     private val performRegister: PerformRegister
 ) : ViewModel() {
 
-    private val _viewState = MutableStateFlow<LoginViewState>(LoginViewState.Empty)
+    private val _viewState = MutableStateFlow<LoginViewState>(LoginViewState.None)
     val viewState: StateFlow<LoginViewState>
         get() = _viewState.asStateFlow()
 

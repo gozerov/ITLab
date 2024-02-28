@@ -8,4 +8,7 @@
     <string name="account_exists">Аккаунт с таким именем уже существует</string>
     <string name="bad_credentials">Неправильный логин/пароль</string>
     <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="accounts">Аккаунты</string>
+    <string name="no_accounts">Нет аккаунтов</string>
+    <string name="login_in_another_account">Войти в другой аккаунт</string>
 </resources>

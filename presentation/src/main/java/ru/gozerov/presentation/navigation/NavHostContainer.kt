@@ -8,6 +8,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import ru.gozerov.presentation.screens.choose_account.ChooseAccountScreen
+import ru.gozerov.presentation.screens.choose_account.ChooseAccountViewModel
 import ru.gozerov.presentation.screens.login.LoginScreen
 import ru.gozerov.presentation.screens.login.LoginViewModel
 
@@ -19,13 +21,24 @@ fun NavHostContainer(
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Login.route,
+        startDestination = Screen.ChooseAccount.route,
         modifier = Modifier.padding(paddingValues = padding),
         builder = {
+            composable(Screen.ChooseAccount.route) {
+                val chooseAccountViewModel = hiltViewModel<ChooseAccountViewModel>()
+                ChooseAccountScreen(
+                    navController = navController,
+                    viewModel = chooseAccountViewModel
+                )
+            }
             composable(Screen.Login.route) {
                 val loginViewModel = hiltViewModel<LoginViewModel>()
-                LoginScreen(navController = navController, viewModel = loginViewModel)
+                LoginScreen(
+                    navController = navController,
+                    viewModel = loginViewModel
+                )
             }
+
         })
 
 }

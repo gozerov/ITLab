@@ -23,6 +23,7 @@ class LoginRepositoryImpl @Inject constructor(
                 val response = loginRemote.login(username, password)
                 response
                     .onSuccess {
+                        userStorage.saveUser(it.access_token, username)
                         emit(LoginResult.SuccessLogin)
                     }
                     .onFailure { throwable ->
@@ -44,7 +45,11 @@ class LoginRepositoryImpl @Inject constructor(
                 val response = loginRemote.register(username, password)
                 response
                     .onSuccess {
-                        emit(SignUpResult.SuccessLogin(response.getOrThrow().username))
+                        val loginResponse = loginRemote.login(username, password)
+                        loginResponse.onSuccess { loginBody ->
+                            userStorage.saveUser(loginBody.access_token, username)
+                            emit(SignUpResult.SuccessLogin(response.getOrThrow().username))
+                        }
                     }
                     .onFailure { throwable ->
                         throwable.message?.let { message ->
