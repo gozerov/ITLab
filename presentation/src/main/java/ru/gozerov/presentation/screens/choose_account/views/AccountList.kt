@@ -1,7 +1,8 @@
 package ru.gozerov.presentation.screens.choose_account.views
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,14 +17,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -31,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ru.gozerov.domain.models.users.User
 import ru.gozerov.presentation.R
-import ru.gozerov.presentation.screens.login.views.DefaultLoginButton
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +42,10 @@ import ru.gozerov.presentation.ui.theme.ITLabTheme
 fun AccountsList(
     contentPadding: PaddingValues,
     userList: MutableState<List<User>>,
-    onLoginInAnotherAccount: () -> Unit
+    isListEmpty: Boolean,
+    onLoginInAnotherAccount: () -> Unit,
+    onItemClick: (user: User) -> Unit,
+    onCloseClick: (user: User) -> Unit
 ) {
     Scaffold(
         modifier = Modifier
@@ -59,12 +65,12 @@ fun AccountsList(
                 style = ITLabTheme.typography.body,
             )
             Spacer(modifier = Modifier.height(24.dp))
-            if (userList.value.isNotEmpty()) {
+            if (!isListEmpty) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     content = {
                         items(userList.value.size) {
-                            AccountItem(userList.value[it], { })
+                            AccountItem(userList.value[it], onItemClick, onCloseClick)
                         }
                     }
                 )
@@ -96,13 +102,20 @@ fun AccountsList(
 }
 
 @Composable
-fun AccountItem(user: User, onClick: (user: User) -> Unit) {
+fun AccountItem(user: User, onItemClick: (user: User) -> Unit, onCloseClick: (user: User) -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
     Row(
         modifier = Modifier
             .padding(horizontal = 56.dp, vertical = 4.dp)
             .fillMaxWidth()
             .height(64.dp)
-            .background(ITLabTheme.colors.secondaryBackground, RoundedCornerShape(8.dp)),
+            .background(ITLabTheme.colors.secondaryBackground, RoundedCornerShape(8.dp))
+            .clickable(
+                interactionSource = interactionSource,
+                indication = rememberRipple(radius = 400.dp)
+            ) {
+                onItemClick(user)
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -118,10 +131,14 @@ fun AccountItem(user: User, onClick: (user: User) -> Unit) {
             style = ITLabTheme.typography.heading,
             fontWeight = FontWeight.Normal
         )
-        Icon(
+        IconButton(
             modifier = Modifier.padding(16.dp),
-            imageVector = Icons.Default.Close,
-            contentDescription = null
-        )
+            onClick = { onCloseClick(user) }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = null
+            )
+        }
     }
 }

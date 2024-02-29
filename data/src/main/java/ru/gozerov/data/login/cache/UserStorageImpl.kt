@@ -1,6 +1,8 @@
 package ru.gozerov.data.login.cache
 
 import android.content.SharedPreferences
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import ru.gozerov.data.login.cache.room.UserDao
 import ru.gozerov.data.login.cache.room.UserEntity
 import ru.gozerov.data.utils.ApiConstants
@@ -16,7 +18,8 @@ class UserStorageImpl @Inject constructor(
         sharedPreferences.getString(ApiConstants.KEY_ACCESS_TOKEN, null)
 
     override fun saveAccessToken(token: String) {
-        sharedPreferences.edit()
+        sharedPreferences
+            .edit()
             .putString(ApiConstants.KEY_ACCESS_TOKEN, token)
             .apply()
     }
@@ -26,8 +29,17 @@ class UserStorageImpl @Inject constructor(
         saveAccessToken(token)
     }
 
-    override suspend fun getUsers(): List<User> {
-        return userDao.getUsers().map { it.toUser() }
+    override suspend fun getUsers(): Flow<List<User>> {
+        return userDao.getUsers().map { list -> list.map { userEntity ->  userEntity.toUser() } }
+    }
+
+    override suspend fun deleteUser(username: String) {
+        userDao.deleteUserByName(username)
+    }
+
+    override suspend fun refreshActiveAccount(username: String) {
+        val user = userDao.getUserByName(username)
+        saveAccessToken(user.token)
     }
 
 }

@@ -1,5 +1,6 @@
 package ru.gozerov.data.login.cache
 
+import kotlinx.coroutines.flow.Flow
 import ru.gozerov.domain.models.users.User
 
 interface UserStorage {
@@ -10,6 +11,10 @@ interface UserStorage {
 
     suspend fun saveUser(token: String, username: String)
 
-    suspend fun getUsers(): List<User>
+    suspend fun getUsers(): Flow<List<User>>
+
+    suspend fun deleteUser(username: String)
+
+    suspend fun refreshActiveAccount(username: String)
 
 }

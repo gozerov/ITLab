@@ -6,4 +6,6 @@ object ApiConstants {
 
     const val KEY_ACCESS_TOKEN = "ACCESS_TOKEN"
 
+    const val HTTP_400 = "HTTP 400 "
+
 }

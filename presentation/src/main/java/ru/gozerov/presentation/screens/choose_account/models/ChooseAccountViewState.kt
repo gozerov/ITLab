@@ -12,6 +12,8 @@ sealed class ChooseAccountViewState {
         val users: List<User>
     ) : ChooseAccountViewState()
 
+    class SuccessLogin: ChooseAccountViewState()
+
     class Error : ChooseAccountViewState()
 
 }

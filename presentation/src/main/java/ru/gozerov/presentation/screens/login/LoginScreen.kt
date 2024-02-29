@@ -17,7 +17,7 @@ import ru.gozerov.presentation.R
 import ru.gozerov.presentation.screens.login.models.LoginIntent
 import ru.gozerov.presentation.screens.login.models.LoginViewState
 import ru.gozerov.presentation.screens.login.views.LoginForm
-import ru.gozerov.presentation.screens.login.views.showError
+import ru.gozerov.presentation.screens.shared.showError
 
 @Composable
 fun LoginScreen(

@@ -2,12 +2,17 @@ package ru.gozerov.data.login
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 import ru.gozerov.data.login.cache.UserStorage
 import ru.gozerov.data.login.remote.LoginRemote
+import ru.gozerov.data.utils.ApiConstants
+import ru.gozerov.domain.models.login.DeleteUserResult
 import ru.gozerov.domain.models.login.GetUsersResult
 import ru.gozerov.domain.models.login.LoginResult
+import ru.gozerov.domain.models.login.LoginWithoutPasswordResult
 import ru.gozerov.domain.models.login.SignUpResult
 import ru.gozerov.domain.repositories.LoginRepository
 import javax.inject.Inject
@@ -37,7 +42,6 @@ class LoginRepositoryImpl @Inject constructor(
             }
         }
 
-
     override suspend fun register(username: String, password: String): Flow<SignUpResult> =
         withContext(Dispatchers.IO) {
             return@withContext flow<SignUpResult> {
@@ -53,7 +57,7 @@ class LoginRepositoryImpl @Inject constructor(
                     }
                     .onFailure { throwable ->
                         throwable.message?.let { message ->
-                            if (message == "HTTP 400 ")
+                            if (message == ApiConstants.HTTP_400)
                                 emit(SignUpResult.AccountExist)
                             else
                                 emit(SignUpResult.UnknownException)
@@ -64,8 +68,31 @@ class LoginRepositoryImpl @Inject constructor(
 
     override suspend fun getUsers(): Flow<GetUsersResult> = withContext(Dispatchers.IO) {
         return@withContext flow<GetUsersResult> {
-            emit(GetUsersResult.Success(userStorage.getUsers()))
+            userStorage.getUsers()
+                .onEach { users ->
+                    if (users.isEmpty())
+                        emit(GetUsersResult.EmptyList)
+                    else
+                        emit(GetUsersResult.Success(users))
+                }
+                .collect()
         }
     }
+
+    override suspend fun deleteUserByName(name: String): Flow<DeleteUserResult> =
+        withContext(Dispatchers.IO) {
+            return@withContext flow<DeleteUserResult> {
+                userStorage.deleteUser(name)
+                emit(DeleteUserResult.Success)
+            }
+        }
+
+    override suspend fun loginWithoutPassword(username: String): Flow<LoginWithoutPasswordResult> =
+        withContext(Dispatchers.IO) {
+            return@withContext flow<LoginWithoutPasswordResult> {
+                userStorage.refreshActiveAccount(username)
+                emit(LoginWithoutPasswordResult.Success)
+            }
+        }
 
 }
