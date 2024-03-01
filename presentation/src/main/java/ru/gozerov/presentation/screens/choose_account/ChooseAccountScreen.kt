@@ -1,6 +1,5 @@
 package ru.gozerov.presentation.screens.choose_account
 
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
@@ -66,7 +65,8 @@ fun ChooseAccountScreen(navController: NavController, viewModel: ChooseAccountVi
             }
 
             is ChooseAccountViewState.SuccessLogin -> {
-                Log.e("AAA", "Success Login")
+                navController.navigate(Screen.MainSection.route)
+                viewModel.handleIntent(ChooseAccountIntent.ExitScreen)
             }
 
             is ChooseAccountViewState.Error -> {

@@ -9,12 +9,5 @@ sealed class Screen(
 ) {
     object Login : Screen("login")
     object ChooseAccount : Screen("choose_account")
+    object MainSection : Screen("main_section")
 }
-
-/*
-val items = listOf(
-    Screen.News,
-    Screen.Calendar,
-    Screen.Services,
-    Screen.Profile,
-)*/

@@ -1,5 +1,6 @@
 package ru.gozerov.presentation.screens.choose_account
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -100,6 +101,10 @@ class ChooseAccountViewModel @Inject constructor(
 
                 is ChooseAccountIntent.DeleteAccount -> {
                     deleteUser.execute(intent.user.username)
+                }
+
+                is ChooseAccountIntent.ExitScreen -> {
+                    _viewState.emit(ChooseAccountViewState.None())
                 }
             }
         }

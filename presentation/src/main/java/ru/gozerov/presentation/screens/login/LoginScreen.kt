@@ -12,8 +12,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
-import kotlinx.coroutines.launch
 import ru.gozerov.presentation.R
+import ru.gozerov.presentation.navigation.Screen
 import ru.gozerov.presentation.screens.login.models.LoginIntent
 import ru.gozerov.presentation.screens.login.models.LoginViewState
 import ru.gozerov.presentation.screens.login.views.LoginForm
@@ -47,11 +47,7 @@ fun LoginScreen(
         when (viewState.value) {
             is LoginViewState.None -> {}
             is LoginViewState.Success -> {
-                coroutineScope.launch {
-                    snackbarScopeState.showSnackbar(
-                        message = "Success",
-                    )
-                }
+                navController.navigate(Screen.MainSection.route)
             }
 
             is LoginViewState.Loading -> {

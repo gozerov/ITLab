@@ -22,8 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,7 +49,6 @@ fun LoginForm(
 ) {
     val usernameField: MutableState<String> = remember { mutableStateOf("") }
     val passwordField: MutableState<String> = remember { mutableStateOf("") }
-    val passwordVisibleState: MutableState<Boolean> = remember { mutableStateOf(false) }
     Scaffold(
         modifier = Modifier
             .padding(contentPadding)
@@ -66,17 +67,16 @@ fun LoginForm(
                 style = ITLabTheme.typography.body,
             )
             Spacer(modifier = Modifier.height(24.dp))
-            DefaultLoginTextField(
+            LoginTextField(
                 textState = usernameField,
                 isLoadingState = isLoadingState,
                 hintStringRes = R.string.username
             )
             Spacer(modifier = Modifier.height(8.dp))
-            DefaultPasswordTextField(
+            PasswordTextField(
                 textState = passwordField,
                 isLoadingState = isLoadingState,
-                hintStringRes = R.string.password,
-                passwordVisibleState = passwordVisibleState
+                hintStringRes = R.string.password
             )
             Spacer(modifier = Modifier.height(48.dp))
             DefaultLoginButton(
@@ -102,7 +102,7 @@ fun LoginForm(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DefaultLoginTextField(
+fun LoginTextField(
     textState: MutableState<String>,
     isLoadingState: MutableState<Boolean>,
     @StringRes hintStringRes: Int
@@ -134,12 +134,12 @@ fun DefaultLoginTextField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DefaultPasswordTextField(
+fun PasswordTextField(
     textState: MutableState<String>,
     isLoadingState: MutableState<Boolean>,
-    passwordVisibleState: MutableState<Boolean>,
     @StringRes hintStringRes: Int
 ) {
+    var isPasswordVisible by remember { mutableStateOf(false) }
     OutlinedTextField(
         modifier = Modifier
             .padding(horizontal = 64.dp)
@@ -161,15 +161,15 @@ fun DefaultPasswordTextField(
             focusedIndicatorColor = ITLabTheme.colors.tintColor,
             cursorColor = ITLabTheme.colors.tintColor
         ),
-        visualTransformation = if (passwordVisibleState.value) VisualTransformation.None else PasswordVisualTransformation(),
+        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         trailingIcon = {
-            val image = if (passwordVisibleState.value)
+            val image = if (isPasswordVisible)
                 painterResource(id = R.drawable.ic_visibility_24)
             else
                 painterResource(id = R.drawable.ic_visibility_off_24)
 
-            IconButton(onClick = { passwordVisibleState.value = !passwordVisibleState.value }) {
+            IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                 Icon(painter = image, null)
             }
         }

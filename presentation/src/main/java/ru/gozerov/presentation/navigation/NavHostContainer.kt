@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -12,6 +13,7 @@ import ru.gozerov.presentation.screens.choose_account.ChooseAccountScreen
 import ru.gozerov.presentation.screens.choose_account.ChooseAccountViewModel
 import ru.gozerov.presentation.screens.login.LoginScreen
 import ru.gozerov.presentation.screens.login.LoginViewModel
+import ru.gozerov.presentation.screens.main_section.MainSection
 
 @Composable
 fun NavHostContainer(
@@ -22,7 +24,6 @@ fun NavHostContainer(
     NavHost(
         navController = navController,
         startDestination = Screen.ChooseAccount.route,
-        modifier = Modifier.padding(paddingValues = padding),
         builder = {
             composable(Screen.ChooseAccount.route) {
                 val chooseAccountViewModel = hiltViewModel<ChooseAccountViewModel>()
@@ -38,7 +39,10 @@ fun NavHostContainer(
                     viewModel = loginViewModel
                 )
             }
-
-        })
+            composable(Screen.MainSection.route) {
+                MainSection(rootNavController = navController)
+            }
+        }
+    )
 
 }

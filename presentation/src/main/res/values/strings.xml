@@ -11,4 +11,7 @@
     <string name="accounts">Аккаунты</string>
     <string name="no_accounts">Нет аккаунтов</string>
     <string name="login_in_another_account">Войти в другой аккаунт</string>
+    <string name="tag_map">Карта</string>
+    <string name="tag_list">Метки</string>
+    <string name="account">Аккаунт</string>
 </resources>

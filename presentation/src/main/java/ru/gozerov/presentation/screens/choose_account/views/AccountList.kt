@@ -30,6 +30,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -63,6 +64,7 @@ fun AccountsList(
             Text(
                 text = stringResource(id = R.string.accounts),
                 style = ITLabTheme.typography.body,
+                fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(24.dp))
             if (!isListEmpty) {
@@ -110,6 +112,7 @@ fun AccountItem(user: User, onItemClick: (user: User) -> Unit, onCloseClick: (us
             .fillMaxWidth()
             .height(64.dp)
             .background(ITLabTheme.colors.secondaryBackground, RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(8.dp))
             .clickable(
                 interactionSource = interactionSource,
                 indication = rememberRipple(radius = 400.dp)
