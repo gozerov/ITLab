@@ -1,5 +1,6 @@
 package ru.gozerov.data.tags
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -28,6 +29,7 @@ class TagRepositoryImpl @Inject constructor(
                     emit(GetTagsResult.Success(it))
                 }
                 .onFailure {
+                    Log.e("AA", it.message.toString())
                     emit(GetTagsResult.Error)
                 }
         }

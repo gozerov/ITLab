@@ -5,19 +5,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @Composable
-fun SetupSystemBars() {
+fun SetupSystemBars(
+    statusBarColor: Color? = null,
+    useLightIcons: Boolean? = null
+) {
     val systemUiController = rememberSystemUiController()
-    val useDarkIcons = !isSystemInDarkTheme()
-
+    val useDarkIcons =
+        if (isSystemInDarkTheme() && useLightIcons != null) useLightIcons else !isSystemInDarkTheme()
+    val navigationBarColor = ITLabTheme.colors.primaryBackground
+    val mergedStatusBarColor = statusBarColor ?: ITLabTheme.colors.statusBarColor
     DisposableEffect(systemUiController, useDarkIcons) {
         systemUiController.setStatusBarColor(
-            color = Color.Transparent,
+            color = mergedStatusBarColor,
             darkIcons = useDarkIcons
         )
         systemUiController.setNavigationBarColor(
-            color = Color.White,
+            color = navigationBarColor,
             darkIcons = useDarkIcons
         )
         onDispose { }

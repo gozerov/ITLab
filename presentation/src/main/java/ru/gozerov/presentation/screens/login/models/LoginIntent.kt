@@ -12,4 +12,6 @@ sealed class LoginIntent {
         val password: String
     ): LoginIntent()
 
+    object Exit : LoginIntent()
+
 }

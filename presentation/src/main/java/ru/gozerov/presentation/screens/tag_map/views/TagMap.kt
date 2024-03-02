@@ -1,6 +1,7 @@
 package ru.gozerov.presentation.screens.tag_map.views
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -31,6 +33,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
@@ -39,12 +42,22 @@ import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.R
 import ru.gozerov.presentation.screens.shared.RequestCoarseLocation
 import ru.gozerov.presentation.screens.shared.RequestFineLocation
+import ru.gozerov.presentation.screens.shared.SetupSystemBars
+import ru.gozerov.presentation.screens.tag_map.models.TagData
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 import ru.gozerov.presentation.utils.getLocation
 import ru.gozerov.presentation.utils.moveCamera
 
+private val mapObjectTapListener = object : MapObjectTapListener {
+    override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean{
+        val (pickedState, tag) = mapObject.userData as TagData
+        pickedState.value = tag
+        return true
+    }
+}
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "MissingPermission")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TagMap(
     contentPadding: PaddingValues,
@@ -56,9 +69,11 @@ fun TagMap(
         mutableStateOf(null)
     }
     val moveCameraToUserState: MutableState<Point?> = remember { mutableStateOf(null) }
+
     val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
 
+    var isSetupSystemBarsNeeded by remember { mutableStateOf(false) }
     val pickedTag: MutableState<Tag?> = remember { mutableStateOf(null) }
     val tagBottomSheetState = rememberModalBottomSheetState()
 
@@ -66,17 +81,20 @@ fun TagMap(
         mapViewState.value?.mapWindow?.map?.mapObjects?.addPlacemark {
             it.geometry = Point(tag.latitude, tag.longitude)
             it.setIcon(ImageProvider.fromResource(context, R.drawable.ic_pin))
-            it.addTapListener { _, _ ->
-                pickedTag.value = tag
-                return@addTapListener true
-            }
+            it.userData = TagData(pickedTag, tag)
+            it.addTapListener(mapObjectTapListener)
         }
     }
 
+    if (isSetupSystemBarsNeeded)
+        SetupSystemBars(Color.Transparent, true)
+
     SetupMap(moveCameraToUserState, mapViewState, fusedLocationClient)
+    SetupSystemBars(Color.Transparent, true)
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
+            .padding(contentPadding)
             .background(ITLabTheme.colors.primaryBackground)
     ) {
         Box(
@@ -86,7 +104,8 @@ fun TagMap(
         ) {
             AndroidView(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxSize()
+                    .padding(bottom = it.calculateTopPadding()),
                 factory = { context ->
                     MapView(context).apply {
                         mapViewState.value = this
@@ -129,10 +148,16 @@ fun TagMap(
                 }
             }
             pickedTag.value?.let {
+                isSetupSystemBarsNeeded = false
                 TagDetailsDialog(
                     tagState = pickedTag,
                     tagBottomSheetState = tagBottomSheetState,
-                    coroutineScope = coroutineScope
+                    coroutineScope = coroutineScope,
+                    onDismiss = {
+                        moveCameraToUserState.value = null
+                        pickedTag.value = null
+                        isSetupSystemBarsNeeded = true
+                    }
                 )
             }
 

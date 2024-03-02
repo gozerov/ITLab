@@ -33,13 +33,13 @@ fun BottomNavigationBar(navController: NavController, contentPaddingValues: Padd
                     Icon(
                         painter = painterResource(screen.iconId),
                         contentDescription = null,
-                        tint = if (isSelected) ITLabTheme.colors.tintColor else ITLabTheme.colors.navigationBarColor
+                        tint = if (isSelected) ITLabTheme.colors.tintColor else ITLabTheme.colors.primaryText
                     )
                 },
                 label = {
                     Text(
                         text = stringResource(id = screen.labelId),
-                        color = if (isSelected) ITLabTheme.colors.tintColor else ITLabTheme.colors.navigationBarColor
+                        color = if (isSelected) ITLabTheme.colors.tintColor else ITLabTheme.colors.primaryText
                     )
                 },
                 selected = isSelected,

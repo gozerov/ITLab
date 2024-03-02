@@ -92,6 +92,9 @@ class LoginViewModel @Inject constructor(
                 is LoginIntent.PerformRegister -> {
                     performRegister.execute(LoginData(intent.username, intent.password))
                 }
+                is LoginIntent.Exit -> {
+                    _viewState.emit(LoginViewState.None)
+                }
             }
         }
     }

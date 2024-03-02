@@ -1,9 +1,9 @@
 package ru.gozerov.presentation.screens.login
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +48,7 @@ fun LoginScreen(
             is LoginViewState.None -> {}
             is LoginViewState.Success -> {
                 navController.navigate(Screen.MainSection.route)
+                viewModel.handleIntent(LoginIntent.Exit)
             }
 
             is LoginViewState.Loading -> {

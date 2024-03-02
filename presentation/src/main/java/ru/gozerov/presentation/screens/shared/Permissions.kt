@@ -31,6 +31,8 @@ fun RequestFineLocation(onSuccess: () -> Unit) {
             fineLocationPermissionState.launchPermissionRequest()
         }
     if (fineLocationPermissionState.status is PermissionStatus.Granted) {
-        onSuccess()
+        LaunchedEffect(key1 = null) {
+            onSuccess()
+        }
     }
 }

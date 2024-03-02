@@ -19,7 +19,7 @@ fun DefaultMapButton(
         modifier = modifier,
         colors = IconButtonDefaults.iconButtonColors(
             containerColor = ITLabTheme.colors.primaryBackground.copy(
-                0.8f
+                0.9f
             )
         ),
         onClick = onClick

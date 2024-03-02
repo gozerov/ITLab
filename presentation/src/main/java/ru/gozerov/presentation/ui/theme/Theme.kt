@@ -70,21 +70,6 @@ fun ITLabTheme(
         }
     )
 
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            if (darkTheme) {
-                window.statusBarColor = baseDarkPalette.primaryBackground.toArgb()
-                window.navigationBarColor = baseDarkPalette.navigationBarColor.toArgb()
-            }
-            else {
-                window.statusBarColor = baseLightPalette.primaryBackground.toArgb()
-                window.navigationBarColor = baseLightPalette.navigationBarColor.toArgb()
-            }
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-        }
-    }
     CompositionLocalProvider(
         LocalITLabColors provides colors,
         LocalITLabTypography provides typography,

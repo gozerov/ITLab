@@ -14,7 +14,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import ru.gozerov.domain.models.tags.Tag
+import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.screens.tag_map.models.TagMapIntent
 import ru.gozerov.presentation.screens.tag_map.models.TagMapViewState
 import ru.gozerov.presentation.screens.tag_map.views.TagMap
@@ -24,6 +26,7 @@ fun TagMapScreen(
     viewModel: TagMapViewModel
 ) {
     val snackbarScopeState = remember { SnackbarHostState() }
+    SetupSystemBars(statusBarColor = Color.Transparent)
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = {

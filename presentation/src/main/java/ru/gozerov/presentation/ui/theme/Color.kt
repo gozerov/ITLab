@@ -6,22 +6,22 @@ val baseLightPalette = ITLabColors(
     primaryBackground = Color(0xFFFFFFFF),
     primaryText = Color(0xFF000000),
     secondaryBackground = Color(0xFFF5F5F5),
-    secondaryText = Color(0xCC7A8A99),
+    secondaryText = Color(0xFFFFFFFF),
     tintColor = Color(0xFF2196F3),
     controlColor = Color(0xFFBDBDBD),
     errorColor = Color(0xFFFF3377),
-    navigationBarColor = Color(0xFF000000),
-    actionColor = Color(0xFF33CB26)
+    actionColor = Color(0xFF33CB26),
+    statusBarColor = Color.Transparent
 )
 
 val baseDarkPalette = ITLabColors(
     primaryBackground = Color(0xFF23282D),
-    primaryText = Color(0xFFF2F4F5),
-    secondaryBackground = Color(0xFF191E23),
-    secondaryText = Color(0xCC7A8A99),
+    primaryText = Color(0xFFFFFFFF),
+    secondaryBackground = Color(0xFFF5F5F5),
+    secondaryText = Color(0xFFFFFFFF),
     tintColor = Color(0xFF2196F3),
     controlColor = Color(0xFF7A8A99),
     errorColor = Color(0xFFFF6699),
-    navigationBarColor = Color(0xFF000000),
-    actionColor = Color(0xFF33CB26)
+    actionColor = Color(0xFF33CB26),
+    statusBarColor = Color(0xFF23282D)
 )
