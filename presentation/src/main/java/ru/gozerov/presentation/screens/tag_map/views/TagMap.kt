@@ -1,55 +1,87 @@
 package ru.gozerov.presentation.screens.tag_map.views
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.WindowInsetsControllerCompat
-import com.google.accompanist.systemuicontroller.SystemUiController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.yandex.mapkit.Animation
-import com.yandex.mapkit.map.CameraPosition
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
+import com.yandex.runtime.image.ImageProvider
+import kotlinx.coroutines.launch
+import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.R
+import ru.gozerov.presentation.screens.shared.RequestCoarseLocation
+import ru.gozerov.presentation.screens.shared.RequestFineLocation
 import ru.gozerov.presentation.ui.theme.ITLabTheme
+import ru.gozerov.presentation.utils.getLocation
+import ru.gozerov.presentation.utils.moveCamera
 
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "MissingPermission")
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun TagMap(contentPadding: PaddingValues) {
-    var mapView: MapView? = null
-    DisposableEffect(key1 = LocalLifecycleOwner.current) {
-        onDispose {
-            mapView?.onStop()
+fun TagMap(
+    contentPadding: PaddingValues,
+    tagState: MutableState<List<Tag>>
+) {
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val mapViewState: MutableState<MapView?> = remember {
+        mutableStateOf(null)
+    }
+    val moveCameraToUserState: MutableState<Point?> = remember { mutableStateOf(null) }
+    val fusedLocationClient: FusedLocationProviderClient =
+        LocationServices.getFusedLocationProviderClient(context)
+
+    val pickedTag: MutableState<Tag?> = remember { mutableStateOf(null) }
+    val tagBottomSheetState = rememberModalBottomSheetState()
+
+    tagState.value.forEach { tag ->
+        mapViewState.value?.mapWindow?.map?.mapObjects?.addPlacemark {
+            it.geometry = Point(tag.latitude, tag.longitude)
+            it.setIcon(ImageProvider.fromResource(context, R.drawable.ic_pin))
+            it.addTapListener { _, _ ->
+                pickedTag.value = tag
+                return@addTapListener true
+            }
         }
     }
+
+    SetupMap(moveCameraToUserState, mapViewState, fusedLocationClient)
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .background(ITLabTheme.colors.primaryBackground)
-    ) { paddingValues ->
+    ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize(),
             contentAlignment = Alignment.CenterEnd
         ) {
             AndroidView(
@@ -57,65 +89,79 @@ fun TagMap(contentPadding: PaddingValues) {
                     .fillMaxSize(),
                 factory = { context ->
                     MapView(context).apply {
-                        mapView = this
+                        mapViewState.value = this
                         this.onStart()
                     }
                 }
             )
             Column {
-                FilledIconButton(
+                DefaultMapButton(
                     modifier = Modifier.padding(end = 8.dp, bottom = 4.dp),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = ITLabTheme.colors.primaryBackground.copy(
-                            0.7f
-                        )
-                    ),
-                    onClick = {
-                        mapView?.run {
-                            mapWindow.map.move(
-                                CameraPosition(
-                                    mapWindow.map.cameraPosition.target,
-                                    mapWindow.map.cameraPosition.zoom + 1, 0.0f, 0.0f
-                                ),
-                                Animation(Animation.Type.SMOOTH, 0.2f),
-                                null
-                            )
-                        }
-
-                    }
+                    iconId = R.drawable.ic_add_24
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null
-                    )
+                    mapViewState.value?.run {
+                        moveCamera(
+                            point = mapWindow.map.cameraPosition.target,
+                            zoom = mapWindow.map.cameraPosition.zoom + 1
+                        )
+                    }
                 }
-                FilledIconButton(
+
+                DefaultMapButton(
                     modifier = Modifier.padding(end = 8.dp, top = 4.dp),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = ITLabTheme.colors.primaryBackground.copy(
-                            0.7f
-                        )
-                    ),
-                    onClick = {
-                        mapView?.run {
-                            mapWindow.map.move(
-                                CameraPosition(
-                                    mapWindow.map.cameraPosition.target,
-                                    mapWindow.map.cameraPosition.zoom - 1, 0.0f, 0.0f
-                                ),
-                                Animation(Animation.Type.SMOOTH, 0.2f),
-                                null
-                            )
-                        }
-                    }
+                    iconId = R.drawable.ic_remove_24
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_remove_24),
-                        contentDescription = null
-                    )
+                    mapViewState.value?.run {
+                        moveCamera(
+                            point = mapWindow.map.cameraPosition.target,
+                            zoom = mapWindow.map.cameraPosition.zoom - 1
+                        )
+                    }
+                }
+
+                DefaultMapButton(
+                    modifier = Modifier.padding(end = 8.dp, top = 4.dp),
+                    iconId = R.drawable.ic_location_24
+                ) {
+                    fusedLocationClient.getLocation { loc ->
+                        moveCameraToUserState.value = Point(loc.latitude, loc.longitude)
+                    }
                 }
             }
+            pickedTag.value?.let {
+                TagDetailsDialog(
+                    tagState = pickedTag,
+                    tagBottomSheetState = tagBottomSheetState,
+                    coroutineScope = coroutineScope
+                )
+            }
+
         }
 
+    }
+}
+
+@Composable
+fun SetupMap(
+    moveCameraToUserState: MutableState<Point?>,
+    mapViewState: MutableState<MapView?>,
+    fusedLocationClient: FusedLocationProviderClient
+) {
+    moveCameraToUserState.value?.let { point ->
+        mapViewState.value.moveCamera(point = point, zoom = 16f)
+    }
+
+    RequestCoarseLocation()
+    RequestFineLocation {
+        fusedLocationClient.getLocation { loc ->
+            if (moveCameraToUserState.value == null)
+                moveCameraToUserState.value = Point(loc.latitude, loc.longitude)
+        }
+    }
+
+    DisposableEffect(key1 = LocalLifecycleOwner.current) {
+        onDispose {
+            mapViewState.value?.onStop()
+        }
     }
 }

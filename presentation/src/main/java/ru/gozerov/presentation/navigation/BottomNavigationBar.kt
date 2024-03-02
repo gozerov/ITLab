@@ -1,6 +1,6 @@
 package ru.gozerov.presentation.navigation
 
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -19,9 +18,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(navController: NavController, contentPaddingValues: PaddingValues) {
     BottomNavigation(
-        modifier = Modifier.padding(bottom = 48.dp),
+        modifier = Modifier.padding(contentPaddingValues),
         backgroundColor = ITLabTheme.colors.primaryBackground,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -29,7 +28,6 @@ fun BottomNavigationBar(navController: NavController) {
 
         bottomNavBarItems.forEach { screen ->
             val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-
             BottomNavigationItem(
                 icon = {
                     Icon(
@@ -45,7 +43,6 @@ fun BottomNavigationBar(navController: NavController) {
                     )
                 },
                 selected = isSelected,
-                //colors = NavigationBarItemDefaults.colors(selectedTextColor = ITLabTheme.colors.actionColor),
                 onClick = {
                     navController.navigate(screen.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
@@ -58,43 +55,5 @@ fun BottomNavigationBar(navController: NavController) {
             )
         }
     }
-
-}
-
-/*
-* NavigationBar(
-        modifier = Modifier.height(56.dp)
-    ) {
-        val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination
-
-        bottomNavBarItems.forEach { screen ->
-            val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-
-            NavigationBarItem(
-                modifier = Modifier.height(48.dp),
-                icon = {
-                    Icon(painter = painterResource(screen.iconId), contentDescription = null)
-                },
-                label = {
-                    Text(text = stringResource(id = screen.labelId))
-                },
-                selected = isSelected,
-                colors = NavigationBarItemDefaults.colors(selectedTextColor = ITLabTheme.colors.actionColor),
-                onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            )
-        }
-    }*/
-
-@Composable
-fun NavItem() {
 
 }

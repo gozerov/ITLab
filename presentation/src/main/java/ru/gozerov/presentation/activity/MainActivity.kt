@@ -1,29 +1,25 @@
 package ru.gozerov.presentation.activity
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
 import ru.gozerov.presentation.navigation.NavHostContainer
+import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MapKitFactory.initialize(this)
@@ -35,23 +31,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Scaffold {
-                        val systemUiController = rememberSystemUiController()
-                        val useDarkIcons = !isSystemInDarkTheme()
-
-                        DisposableEffect(systemUiController, useDarkIcons) {
-                            systemUiController.setStatusBarColor(
-                                color = Color.Transparent,
-                                darkIcons = useDarkIcons
-                            )
-
-                            onDispose {}
-                        }
+                        SetupSystemBars()
                         NavHostContainer(navController = navController, padding = it)
                     }
                 }
-
             }
-
         }
     }
 

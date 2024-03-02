@@ -68,8 +68,8 @@ dependencies {
     //Jetpack Compose
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.2")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("androidx.compose.material:material:1.6.0")
+    implementation(platform("androidx.compose:compose-bom:2024.02.01"))
+    implementation("androidx.compose.material:material:1.6.2")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     debugImplementation("androidx.compose.ui:ui-tooling")
@@ -83,4 +83,7 @@ dependencies {
 
     //SystemUiController
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.35.0-alpha")
+
+    //Permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
 }

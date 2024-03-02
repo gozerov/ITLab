@@ -1,0 +1,63 @@
+package ru.gozerov.presentation.screens.tag_map
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import ru.gozerov.domain.models.tags.GetTagsResult
+import ru.gozerov.domain.usecases.tags.CreateTag
+import ru.gozerov.domain.usecases.tags.DeleteLike
+import ru.gozerov.domain.usecases.tags.GetTags
+import ru.gozerov.domain.usecases.tags.LikeTag
+import ru.gozerov.presentation.screens.tag_map.models.TagMapIntent
+import ru.gozerov.presentation.screens.tag_map.models.TagMapViewState
+import javax.inject.Inject
+
+@HiltViewModel
+class TagMapViewModel @Inject constructor(
+    private val getTags: GetTags,
+    private val createTag: CreateTag,
+    private val likeTag: LikeTag,
+    private val deleteLike: DeleteLike
+) : ViewModel() {
+
+    private val _viewState = MutableStateFlow<TagMapViewState>(TagMapViewState.None)
+    val viewState: StateFlow<TagMapViewState>
+        get() = _viewState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            observeGetTagsResult()
+        }
+    }
+
+    fun handleIntent(intent: TagMapIntent) {
+        viewModelScope.launch {
+            when(intent) {
+                is TagMapIntent.LoadTags -> getTags.execute(Unit)
+            }
+        }
+    }
+
+    private fun CoroutineScope.observeGetTagsResult() {
+        launch {
+            getTags.result.collect { result ->
+                when(result) {
+                    is GetTagsResult.Success -> {
+                        _viewState.emit(TagMapViewState.TagsOnMap(result.tags))
+                    }
+
+                    is GetTagsResult.Error -> {
+                        _viewState.emit(TagMapViewState.Error())
+                    }
+                }
+            }
+        }
+
+    }
+
+}
