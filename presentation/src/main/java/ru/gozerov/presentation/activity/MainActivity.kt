@@ -31,7 +31,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Scaffold {
-                        SetupSystemBars()
                         NavHostContainer(navController = navController, padding = it)
                     }
                 }

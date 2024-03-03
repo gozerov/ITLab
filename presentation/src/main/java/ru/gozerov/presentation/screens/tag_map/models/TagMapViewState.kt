@@ -10,6 +10,10 @@ sealed class TagMapViewState {
         val tags: List<Tag>
     ) : TagMapViewState()
 
+    class UpdateChosenTag(
+        val tag: Tag
+    ) : TagMapViewState()
+
     class Error: TagMapViewState()
 
 }

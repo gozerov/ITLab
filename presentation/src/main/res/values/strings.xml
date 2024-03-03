@@ -14,4 +14,5 @@
     <string name="tag_map">Карта</string>
     <string name="tag_list">Метки</string>
     <string name="account">Аккаунт</string>
+    <string name="author_is">Автор: %1$s</string>
 </resources>

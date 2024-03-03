@@ -65,6 +65,7 @@ fun LoginForm(
             Text(
                 text = stringResource(id = R.string.entry),
                 style = ITLabTheme.typography.body,
+                color = ITLabTheme.colors.primaryText
             )
             Spacer(modifier = Modifier.height(24.dp))
             LoginTextField(
@@ -121,18 +122,20 @@ fun LoginTextField(
         label = {
             Text(text = stringResource(hintStringRes))
         },
-        colors = TextFieldDefaults.textFieldColors(
+        colors = TextFieldDefaults.colors(
             focusedLabelColor = ITLabTheme.colors.tintColor,
-            containerColor = ITLabTheme.colors.primaryBackground,
-            unfocusedIndicatorColor = ITLabTheme.colors.controlColor,
+            unfocusedLabelColor = ITLabTheme.colors.secondaryText,
+            focusedContainerColor = ITLabTheme.colors.primaryBackground,
+            unfocusedContainerColor = ITLabTheme.colors.primaryBackground,
             focusedIndicatorColor = ITLabTheme.colors.tintColor,
-            cursorColor = ITLabTheme.colors.tintColor
+            unfocusedIndicatorColor = ITLabTheme.colors.controlColor,
+            cursorColor = ITLabTheme.colors.tintColor,
+            focusedTextColor = ITLabTheme.colors.primaryText,
         )
     )
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordTextField(
     textState: MutableState<String>,
@@ -154,12 +157,15 @@ fun PasswordTextField(
         label = {
             Text(text = stringResource(hintStringRes))
         },
-        colors = TextFieldDefaults.textFieldColors(
+        colors = TextFieldDefaults.colors(
             focusedLabelColor = ITLabTheme.colors.tintColor,
-            containerColor = ITLabTheme.colors.primaryBackground,
-            unfocusedIndicatorColor = ITLabTheme.colors.controlColor,
+            focusedContainerColor = ITLabTheme.colors.primaryBackground,
+            unfocusedContainerColor = ITLabTheme.colors.primaryBackground,
             focusedIndicatorColor = ITLabTheme.colors.tintColor,
-            cursorColor = ITLabTheme.colors.tintColor
+            unfocusedIndicatorColor = ITLabTheme.colors.controlColor,
+            cursorColor = ITLabTheme.colors.tintColor,
+            focusedTextColor = ITLabTheme.colors.primaryText,
+            unfocusedLabelColor = ITLabTheme.colors.secondaryText
         ),
         visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -170,7 +176,7 @@ fun PasswordTextField(
                 painterResource(id = R.drawable.ic_visibility_off_24)
 
             IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                Icon(painter = image, null)
+                Icon(painter = image, null, tint = ITLabTheme.colors.secondaryText)
             }
         }
     )

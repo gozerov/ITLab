@@ -2,7 +2,9 @@ package ru.gozerov.domain.models.tags
 
 sealed class DeleteLikeResult {
 
-    object Success : DeleteLikeResult()
+    class Success(
+        val tag: Tag
+    ) : DeleteLikeResult()
 
     object Error : DeleteLikeResult()
 

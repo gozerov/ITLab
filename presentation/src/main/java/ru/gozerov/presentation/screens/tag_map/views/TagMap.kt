@@ -1,19 +1,14 @@
 package ru.gozerov.presentation.screens.tag_map.views
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -37,7 +32,6 @@ import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
-import kotlinx.coroutines.launch
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.R
 import ru.gozerov.presentation.screens.shared.RequestCoarseLocation
@@ -49,7 +43,7 @@ import ru.gozerov.presentation.utils.getLocation
 import ru.gozerov.presentation.utils.moveCamera
 
 private val mapObjectTapListener = object : MapObjectTapListener {
-    override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean{
+    override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean {
         val (pickedState, tag) = mapObject.userData as TagData
         pickedState.value = tag
         return true
@@ -61,20 +55,21 @@ private val mapObjectTapListener = object : MapObjectTapListener {
 @Composable
 fun TagMap(
     contentPadding: PaddingValues,
-    tagState: MutableState<List<Tag>>
+    tagState: MutableState<List<Tag>>,
+    onLikeClicked: (tag: Tag, isLikedState: MutableState<Boolean>) -> Unit,
+    pickedTag: MutableState<Tag?>,
+    moveCameraToUserState: MutableState<Point?>,
+    isSetupSystemBarsNeeded: MutableState<Boolean>,
+    onPickedTagDismiss: () -> Unit
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     val mapViewState: MutableState<MapView?> = remember {
         mutableStateOf(null)
     }
-    val moveCameraToUserState: MutableState<Point?> = remember { mutableStateOf(null) }
 
     val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
 
-    var isSetupSystemBarsNeeded by remember { mutableStateOf(false) }
-    val pickedTag: MutableState<Tag?> = remember { mutableStateOf(null) }
     val tagBottomSheetState = rememberModalBottomSheetState()
 
     tagState.value.forEach { tag ->
@@ -86,7 +81,7 @@ fun TagMap(
         }
     }
 
-    if (isSetupSystemBarsNeeded)
+    if (isSetupSystemBarsNeeded.value)
         SetupSystemBars(Color.Transparent, true)
 
     SetupMap(moveCameraToUserState, mapViewState, fusedLocationClient)
@@ -148,16 +143,12 @@ fun TagMap(
                 }
             }
             pickedTag.value?.let {
-                isSetupSystemBarsNeeded = false
+                isSetupSystemBarsNeeded.value = false
                 TagDetailsDialog(
                     tagState = pickedTag,
                     tagBottomSheetState = tagBottomSheetState,
-                    coroutineScope = coroutineScope,
-                    onDismiss = {
-                        moveCameraToUserState.value = null
-                        pickedTag.value = null
-                        isSetupSystemBarsNeeded = true
-                    }
+                    onLikeClicked = onLikeClicked,
+                    onDismiss = onPickedTagDismiss
                 )
             }
 
@@ -167,7 +158,7 @@ fun TagMap(
 }
 
 @Composable
-fun SetupMap(
+private fun SetupMap(
     moveCameraToUserState: MutableState<Point?>,
     mapViewState: MutableState<MapView?>,
     fusedLocationClient: FusedLocationProviderClient

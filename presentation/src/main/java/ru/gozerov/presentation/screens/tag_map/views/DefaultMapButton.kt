@@ -26,7 +26,8 @@ fun DefaultMapButton(
     ) {
         Icon(
             painter = painterResource(id = iconId),
-            contentDescription = null
+            contentDescription = null,
+            tint = ITLabTheme.colors.primaryText
         )
     }
 }

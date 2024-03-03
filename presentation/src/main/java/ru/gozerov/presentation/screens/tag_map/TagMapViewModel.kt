@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.gozerov.domain.models.tags.DeleteLikeResult
 import ru.gozerov.domain.models.tags.GetTagsResult
+import ru.gozerov.domain.models.tags.LikeTagResult
 import ru.gozerov.domain.usecases.tags.CreateTag
 import ru.gozerov.domain.usecases.tags.DeleteLike
 import ru.gozerov.domain.usecases.tags.GetTags
@@ -32,6 +34,8 @@ class TagMapViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             observeGetTagsResult()
+            observeLikeTagResult()
+            observeDeleteLikeTagResult()
         }
     }
 
@@ -39,6 +43,8 @@ class TagMapViewModel @Inject constructor(
         viewModelScope.launch {
             when(intent) {
                 is TagMapIntent.LoadTags -> getTags.execute(Unit)
+                is TagMapIntent.LikeTag -> likeTag.execute(intent.tag.id)
+                is TagMapIntent.UnlikeTag -> deleteLike.execute(intent.tag)
             }
         }
     }
@@ -57,7 +63,38 @@ class TagMapViewModel @Inject constructor(
                 }
             }
         }
+    }
 
+    private fun CoroutineScope.observeLikeTagResult() {
+        launch {
+            likeTag.result.collect { result ->
+                when(result) {
+                    is LikeTagResult.Success -> {
+                        _viewState.emit(TagMapViewState.UpdateChosenTag(result.tag))
+                    }
+
+                    is LikeTagResult.Error -> {
+                        _viewState.emit(TagMapViewState.Error())
+                    }
+                }
+            }
+        }
+    }
+
+    private fun CoroutineScope.observeDeleteLikeTagResult() {
+        launch {
+            deleteLike.result.collect { result ->
+                when(result) {
+                    is DeleteLikeResult.Success -> {
+                        _viewState.emit(TagMapViewState.UpdateChosenTag(result.tag))
+                    }
+
+                    is DeleteLikeResult.Error -> {
+                        _viewState.emit(TagMapViewState.Error())
+                    }
+                }
+            }
+        }
     }
 
 }

@@ -19,6 +19,6 @@ interface TagRepository : Repository {
 
     suspend fun likeTag(tagId: String): Flow<LikeTagResult>
 
-    suspend fun deleteLike(tagId: String): Flow<DeleteLikeResult>
+    suspend fun deleteLike(tag: Tag): Flow<DeleteLikeResult>
 
 }

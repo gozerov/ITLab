@@ -13,6 +13,7 @@ import ru.gozerov.domain.models.tags.DeleteLikeResult
 import ru.gozerov.domain.models.tags.DeleteTagResult
 import ru.gozerov.domain.models.tags.GetTagsResult
 import ru.gozerov.domain.models.tags.LikeTagResult
+import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.domain.repositories.TagRepository
 import javax.inject.Inject
 
@@ -23,15 +24,29 @@ class TagRepositoryImpl @Inject constructor(
 
     override suspend fun getTags(): Flow<GetTagsResult> = withContext(Dispatchers.IO) {
         return@withContext flow<GetTagsResult> {
-            val response = tagRemote.getTags()
-            response
-                .onSuccess {
-                    emit(GetTagsResult.Success(it))
-                }
-                .onFailure {
-                    Log.e("AA", it.message.toString())
-                    emit(GetTagsResult.Error)
-                }
+            val token = userStorage.getCurrentAccessToken()
+            if (token != null) {
+                val response = tagRemote.getTagsAuthorized(token)
+                response
+                    .onSuccess {
+                        Log.e("AAA", it.filter { it.isLiked }.toString())
+                        emit(GetTagsResult.Success(it))
+                    }
+                    .onFailure {
+                        Log.e("AA", it.message.toString())
+                        emit(GetTagsResult.Error)
+                    }
+            } else {
+                val response = tagRemote.getTags()
+                response
+                    .onSuccess {
+                        emit(GetTagsResult.Success(it))
+                    }
+                    .onFailure {
+                        Log.e("AA", it.message.toString())
+                        emit(GetTagsResult.Error)
+                    }
+            }
         }
     }
 
@@ -104,15 +119,15 @@ class TagRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteLike(tagId: String): Flow<DeleteLikeResult> =
+    override suspend fun deleteLike(tag: Tag): Flow<DeleteLikeResult> =
         withContext(Dispatchers.IO) {
             return@withContext flow<DeleteLikeResult> {
                 val token = userStorage.getCurrentAccessToken()
                 token?.let {
-                    val response = tagRemote.deleteLikeAuthorized(tagId, token)
+                    val response = tagRemote.deleteLikeAuthorized(tag.id, token)
                     response
                         .onSuccess {
-                            emit(DeleteLikeResult.Success)
+                            emit(DeleteLikeResult.Success(tag.copy(isLiked = false, likes = tag.likes - 1)))
                         }
                         .onFailure {
                             emit(DeleteLikeResult.Error)

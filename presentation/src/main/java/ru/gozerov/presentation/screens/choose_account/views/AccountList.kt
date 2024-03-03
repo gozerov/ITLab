@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ru.gozerov.domain.models.users.User
 import ru.gozerov.presentation.R
+import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +49,7 @@ fun AccountsList(
     onItemClick: (user: User) -> Unit,
     onCloseClick: (user: User) -> Unit
 ) {
+    SetupSystemBars()
     Scaffold(
         modifier = Modifier
             .padding(contentPadding)
@@ -64,7 +66,8 @@ fun AccountsList(
             Text(
                 text = stringResource(id = R.string.accounts),
                 style = ITLabTheme.typography.body,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = ITLabTheme.colors.primaryText
             )
             Spacer(modifier = Modifier.height(24.dp))
             if (!isListEmpty) {
@@ -124,22 +127,24 @@ fun AccountItem(user: User, onItemClick: (user: User) -> Unit, onCloseClick: (us
         Icon(
             modifier = Modifier.padding(16.dp),
             imageVector = Icons.Default.AccountCircle,
+            tint = ITLabTheme.colors.primaryText,
             contentDescription = null
         )
         Text(
             modifier = Modifier
-                .padding(horizontal = 16.dp)
                 .weight(1f),
             text = user.username,
             style = ITLabTheme.typography.heading,
-            fontWeight = FontWeight.Normal
+            fontWeight = FontWeight.Normal,
+            color = ITLabTheme.colors.primaryText
         )
         IconButton(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(end = 8.dp),
             onClick = { onCloseClick(user) }
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
+                tint = ITLabTheme.colors.primaryText,
                 contentDescription = null
             )
         }

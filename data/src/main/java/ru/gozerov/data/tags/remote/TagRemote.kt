@@ -6,6 +6,8 @@ interface TagRemote {
 
     suspend fun getTags(): Result<List<Tag>>
 
+    suspend fun getTagsAuthorized(accessToken: String): Result<List<Tag>>
+
     suspend fun createTag(latitude: Double, longitude: Double, description: String): Result<Tag>
 
     suspend fun createTagAuthorized(

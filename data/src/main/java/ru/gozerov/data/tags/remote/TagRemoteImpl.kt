@@ -1,5 +1,6 @@
 package ru.gozerov.data.tags.remote
 
+import android.util.Log
 import ru.gozerov.data.tags.remote.models.CreateTagRequestBody
 import ru.gozerov.data.utils.toTag
 import ru.gozerov.domain.models.tags.Tag
@@ -11,6 +12,12 @@ class TagRemoteImpl @Inject constructor(
 
     override suspend fun getTags(): Result<List<Tag>> {
         return tagApi.getTags().map { list -> list.map { tagResponse -> tagResponse.toTag() } }
+    }
+
+    override suspend fun getTagsAuthorized(accessToken: String): Result<List<Tag>> {
+        val bearer = "Bearer $accessToken"
+        Log.e("AAA", bearer)
+        return tagApi.getTagsAuthorized(bearer = bearer).map { list -> list.map { tagResponse -> tagResponse.toTag() } }
     }
 
     override suspend fun createTag(
@@ -30,8 +37,8 @@ class TagRemoteImpl @Inject constructor(
     ): Result<Tag> {
         val bearer = "Bearer $accessToken"
         return tagApi.createTagAuthorized(
-            CreateTagRequestBody(latitude, longitude, description),
-            bearer
+            bearer,
+            CreateTagRequestBody(latitude, longitude, description)
         ).map { it.toTag() }
     }
 

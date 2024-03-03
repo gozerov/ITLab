@@ -1,20 +1,36 @@
 package ru.gozerov.presentation.screens.tag_map.views
 
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import coil.compose.SubcomposeAsyncImage
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import ru.gozerov.domain.models.tags.Tag
+import ru.gozerov.presentation.R
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
@@ -23,7 +39,7 @@ import ru.gozerov.presentation.ui.theme.ITLabTheme
 fun TagDetailsDialog(
     tagState: MutableState<Tag?>,
     tagBottomSheetState: SheetState,
-    coroutineScope: CoroutineScope,
+    onLikeClicked: (tag: Tag, isLikedState: MutableState<Boolean>) -> Unit,
     onDismiss: () -> Unit
 ) {
     SetupSystemBars(statusBarColor = Color(0x52000000))
@@ -31,14 +47,93 @@ fun TagDetailsDialog(
     ModalBottomSheet(
         containerColor = ITLabTheme.colors.primaryBackground,
         onDismissRequest = onDismiss,
-        sheetState = tagBottomSheetState
+        sheetState = tagBottomSheetState,
     ) {
-        Button(onClick = {
-            coroutineScope.launch { tagBottomSheetState.hide() }.invokeOnCompletion {
-                onDismiss()
+        tagState.value?.let {
+            TagDetailsCard(it, onLikeClicked)
+        }
+
+    }
+}
+
+@Composable
+private fun TagDetailsCard(
+    tag: Tag,
+    onLikeClicked: (tag: Tag, isLikedState: MutableState<Boolean>) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+    ) {
+        tag.user?.let {
+            Text(
+                text = stringResource(id = R.string.author_is, it.username),
+                color = ITLabTheme.colors.primaryText
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+        Text(
+            text = tag.description,
+            color = ITLabTheme.colors.primaryText
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        tag.image?.let {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                SubcomposeAsyncImage(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 300.dp),
+                    contentScale = ContentScale.Crop,
+                    model = "https://maps.rtuitlab.dev$it",
+                    contentDescription = null,
+                    error = {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_error_load),
+                                contentDescription = null,
+                                tint = ITLabTheme.colors.errorColor
+                            )
+                        }
+
+                    }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
             }
-        }) {
-            Text("Hide bottom sheet")
+
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val isFavoriteState = remember { mutableStateOf(tag.isLiked) }
+            IconButton(
+                modifier = Modifier.padding(end = 8.dp),
+                onClick = {
+                    onLikeClicked(tag, isFavoriteState)
+                }
+            ) {
+                Icon(
+                    painter = painterResource(
+                        id = if (isFavoriteState.value) R.drawable.ic_like_full_24 else R.drawable.ic_like_border_24
+                    ),
+                    contentDescription = null,
+                    tint = ITLabTheme.colors.errorColor
+                )
+            }
+            Text(
+                text = tag.likes.toString(),
+                color = ITLabTheme.colors.primaryText
+            )
         }
     }
+
 }
