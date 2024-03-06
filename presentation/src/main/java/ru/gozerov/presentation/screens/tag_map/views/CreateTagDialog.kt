@@ -1,7 +1,6 @@
 package ru.gozerov.presentation.screens.tag_map.views
 
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
@@ -27,14 +26,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.core.net.toFile
 import ru.gozerov.presentation.R
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @Composable
 fun CreateTagDialog(
     onDismiss: () -> Unit,
-    onConfirm: (description: String, imagePath: String?) -> Unit,
+    onConfirm: (description: String, imageUri: Uri?) -> Unit,
 ) {
     val imageUri = remember { mutableStateOf<Uri?>(null) }
     val launcher =
@@ -124,7 +122,10 @@ fun CreateTagDialog(
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.tintColor),
                         onClick = {
-                            onConfirm(textState.value, imageUri.value?.path)
+                            imageUri.value?.let { uri ->
+                                onConfirm(textState.value, imageUri.value)
+                            }
+//
                         }
                     ) {
                         Text(

@@ -1,17 +1,22 @@
 package ru.gozerov.data.tags.remote
 
+import android.content.Context
+import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import ru.gozerov.data.utils.toTag
 import ru.gozerov.domain.models.tags.Tag
 import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 
 class TagRemoteImpl @Inject constructor(
-    private val tagApi: TagApi
+    private val tagApi: TagApi,
+    @ApplicationContext private val context: Context
 ) : TagRemote {
 
     override suspend fun getTags(): Result<List<Tag>> {
@@ -28,16 +33,9 @@ class TagRemoteImpl @Inject constructor(
         latitude: Double,
         longitude: Double,
         description: String,
-        imagePath: String?
+        imageUri: Uri?
     ): Result<Tag> {
-        val imageFile = imagePath?.let { File(it) }
-        var imagePart: MultipartBody.Part? = null
-        imageFile?.let {
-            val requestBody: RequestBody =
-                RequestBody.create("image/*".toMediaTypeOrNull(), imageFile)
-            imagePart = MultipartBody.Part.createFormData("image", imageFile.getName(), requestBody)
-        }
-        return tagApi.createTag(latitude, longitude, description, imagePart)
+        return tagApi.createTag(latitude, longitude, description, getImagePart(imageUri))
             .map { it.toTag() }
     }
 
@@ -45,17 +43,20 @@ class TagRemoteImpl @Inject constructor(
         latitude: Double,
         longitude: Double,
         description: String,
-        imagePath: String?,
+        imageUri: Uri?,
         accessToken: String
     ): Result<Tag> {
         val bearer = "Bearer $accessToken"
-        val imageFile = imagePath?.let { File(it) }
-        var imagePart: MultipartBody.Part? = null
-        imageFile?.let {
-            val requestBody: RequestBody = imageFile.asRequestBody("image/*".toMediaTypeOrNull())
-            imagePart = MultipartBody.Part.createFormData("image", imageFile.getName(), requestBody)
-        }
-        return tagApi.createTagAuthorized(bearer, latitude, longitude, description, imagePart)
+        val latitudeBody = latitude.toString().toRequestBody(MultipartBody.FORM)
+        val longitudeBody = longitude.toString().toRequestBody(MultipartBody.FORM)
+        val descriptionBody = description.toRequestBody(MultipartBody.FORM)
+        return tagApi.createTagAuthorized(
+            bearer,
+            latitudeBody,
+            longitudeBody,
+            descriptionBody,
+            getImagePart(imageUri)
+        )
             .map { it.toTag() }
     }
 
@@ -72,6 +73,20 @@ class TagRemoteImpl @Inject constructor(
     override suspend fun deleteLikeAuthorized(tagId: String, accessToken: String): Result<String> {
         val bearer = "Bearer $accessToken"
         return tagApi.deleteLikeFromTagAuthorized(tagId, bearer)
+    }
+
+    private fun getImagePart(imageUri: Uri?): MultipartBody.Part? {
+        var part: MultipartBody.Part? = null
+        imageUri?.let { uri ->
+            val filesDir = context.filesDir
+            val file = File(filesDir, "image.png")
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val outputStream = FileOutputStream(file)
+            inputStream!!.copyTo(outputStream)
+            val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
+            part = MultipartBody.Part.createFormData("image", file.name, requestBody)
+        }
+        return part
     }
 
 }

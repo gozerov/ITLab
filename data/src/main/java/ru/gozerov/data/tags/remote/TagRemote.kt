@@ -1,5 +1,6 @@
 package ru.gozerov.data.tags.remote
 
+import android.net.Uri
 import ru.gozerov.domain.models.tags.Tag
 
 interface TagRemote {
@@ -12,14 +13,14 @@ interface TagRemote {
         latitude: Double,
         longitude: Double,
         description: String,
-        imagePath: String? = null
+        imageUri: Uri? = null
     ): Result<Tag>
 
     suspend fun createTagAuthorized(
         latitude: Double,
         longitude: Double,
         description: String,
-        imagePath: String? = null,
+        imageUri: Uri? = null,
         accessToken: String
     ): Result<Tag>
 

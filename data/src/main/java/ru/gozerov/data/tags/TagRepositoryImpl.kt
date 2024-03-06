@@ -58,7 +58,7 @@ class TagRepositoryImpl @Inject constructor(
                         latitude = createTagData.latitude,
                         longitude = createTagData.longitude,
                         description = createTagData.description,
-                        imagePath = createTagData.imagePath,
+                        imageUri = createTagData.imageUri,
                         accessToken = token
                     )
                     response
@@ -74,7 +74,7 @@ class TagRepositoryImpl @Inject constructor(
                         latitude = createTagData.latitude,
                         longitude = createTagData.longitude,
                         description = createTagData.description,
-                        imagePath = createTagData.imagePath
+                        //imagePath = createTagData.imageBody
                     )
                     response
                         .onSuccess { tag ->

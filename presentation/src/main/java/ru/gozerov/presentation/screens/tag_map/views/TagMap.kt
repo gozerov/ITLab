@@ -185,14 +185,14 @@ fun TagMap(
                         addingPoint.value = null
                         isPointAdding.value = false
                     },
-                    onConfirm = { description, imagePath ->
+                    onConfirm = { description, imageBody ->
                         val point = placemarkMapObject.geometry
                         onConfirmCreatingTag(
                             CreateTagData(
                                 latitude = point.latitude,
                                 longitude = point.longitude,
                                 description = description,
-                                imagePath = imagePath
+                                imageUri = imageBody
                             )
                         )
                     }
