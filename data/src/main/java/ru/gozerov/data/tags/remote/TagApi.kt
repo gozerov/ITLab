@@ -1,12 +1,14 @@
 package ru.gozerov.data.tags.remote
 
-import retrofit2.http.Body
+import okhttp3.MultipartBody
 import retrofit2.http.DELETE
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
-import ru.gozerov.data.tags.remote.models.CreateTagRequestBody
 import ru.gozerov.data.tags.remote.models.TagResponseBody
 
 interface TagApi {
@@ -16,17 +18,26 @@ interface TagApi {
 
     @GET("api/tags")
     suspend fun getTagsAuthorized(
-        @Header("Authorization") bearer: String,
-        @Header("Connection") connection: String = "keep-alive"
+        @Header("Authorization") bearer: String
     ): Result<List<TagResponseBody>>
 
+    @FormUrlEncoded
     @POST("api/tags")
-    suspend fun createTag(@Body requestBody: CreateTagRequestBody): Result<TagResponseBody>
+    suspend fun createTag(
+        @Field("latitude") latitude: Double,
+        @Field("longitude") longitude: Double,
+        @Field("description") description: String,
+        @Part("image") image: MultipartBody.Part? = null
+    ): Result<TagResponseBody>
 
+    @FormUrlEncoded
     @POST("api/tags")
     suspend fun createTagAuthorized(
         @Header("Authorization") bearer: String,
-        @Body requestBody: CreateTagRequestBody
+        @Field("latitude") latitude: Double,
+        @Field("longitude") longitude: Double,
+        @Field("description") description: String,
+        @Part("image") image: MultipartBody.Part? = null
     ): Result<TagResponseBody>
 
     @DELETE("api/tags/{tagId}")

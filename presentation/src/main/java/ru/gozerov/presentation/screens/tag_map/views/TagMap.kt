@@ -13,11 +13,8 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,10 +25,14 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.InputListener
+import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.map.MapObjectTapListener
+import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
+import ru.gozerov.domain.models.tags.CreateTagData
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.R
 import ru.gozerov.presentation.screens.shared.RequestCoarseLocation
@@ -60,7 +61,9 @@ fun TagMap(
     pickedTag: MutableState<Tag?>,
     moveCameraToUserState: MutableState<Point?>,
     isSetupSystemBarsNeeded: MutableState<Boolean>,
-    onPickedTagDismiss: () -> Unit
+    isPointAdding: MutableState<Boolean>,
+    onPickedTagDismiss: () -> Unit,
+    onConfirmCreatingTag: (createTagData: CreateTagData) -> Unit
 ) {
     val context = LocalContext.current
     val mapViewState: MutableState<MapView?> = remember {
@@ -71,6 +74,7 @@ fun TagMap(
         LocationServices.getFusedLocationProviderClient(context)
 
     val tagBottomSheetState = rememberModalBottomSheetState()
+    val addingPoint: MutableState<PlacemarkMapObject?> = remember { mutableStateOf(null) }
 
     tagState.value.forEach { tag ->
         mapViewState.value?.mapWindow?.map?.mapObjects?.addPlacemark {
@@ -81,17 +85,32 @@ fun TagMap(
         }
     }
 
+    val inputListener = object : InputListener {
+        override fun onMapTap(map: Map, point: Point) {
+            if (isPointAdding.value) {
+                val placemarkMapObject = map.mapObjects.addPlacemark {
+                    it.geometry = Point(point.latitude, point.longitude)
+                    it.setIcon(ImageProvider.fromResource(context, R.drawable.ic_pin))
+                }
+                addingPoint.value = placemarkMapObject
+            }
+        }
+
+        override fun onMapLongTap(p0: Map, p1: Point) {}
+    }
+
+
     if (isSetupSystemBarsNeeded.value)
         SetupSystemBars(Color.Transparent, true)
 
-    SetupMap(moveCameraToUserState, mapViewState, fusedLocationClient)
+    SetupMap(moveCameraToUserState, mapViewState, fusedLocationClient, inputListener)
     SetupSystemBars(Color.Transparent, true)
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .padding(contentPadding)
+            .padding(bottom = contentPadding.calculateBottomPadding())
             .background(ITLabTheme.colors.primaryBackground)
-    ) {
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize(),
@@ -99,18 +118,18 @@ fun TagMap(
         ) {
             AndroidView(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = it.calculateTopPadding()),
+                    .fillMaxSize(),
                 factory = { context ->
                     MapView(context).apply {
                         mapViewState.value = this
                         this.onStart()
+                        mapViewState.value?.mapWindow?.map?.addInputListener(inputListener)
                     }
                 }
             )
             Column {
                 DefaultMapButton(
-                    modifier = Modifier.padding(end = 8.dp, bottom = 4.dp),
+                    modifier = Modifier.padding(end = 8.dp),
                     iconId = R.drawable.ic_add_24
                 ) {
                     mapViewState.value?.run {
@@ -122,7 +141,7 @@ fun TagMap(
                 }
 
                 DefaultMapButton(
-                    modifier = Modifier.padding(end = 8.dp, top = 4.dp),
+                    modifier = Modifier.padding(end = 8.dp, top = 4.dp, bottom = 4.dp),
                     iconId = R.drawable.ic_remove_24
                 ) {
                     mapViewState.value?.run {
@@ -141,6 +160,14 @@ fun TagMap(
                         moveCameraToUserState.value = Point(loc.latitude, loc.longitude)
                     }
                 }
+
+                DefaultMapButton(
+                    modifier = Modifier.padding(end = 8.dp, top = 32.dp),
+                    iconId = R.drawable.ic_add_location_24,
+                    tint = if (isPointAdding.value) ITLabTheme.colors.tintColor else ITLabTheme.colors.primaryText
+                ) {
+                    isPointAdding.value = !isPointAdding.value
+                }
             }
             pickedTag.value?.let {
                 isSetupSystemBarsNeeded.value = false
@@ -151,9 +178,27 @@ fun TagMap(
                     onDismiss = onPickedTagDismiss
                 )
             }
-
+            addingPoint.value?.let { placemarkMapObject ->
+                CreateTagDialog(
+                    onDismiss = {
+                        mapViewState.value?.mapWindow?.map?.mapObjects?.remove(placemarkMapObject)
+                        addingPoint.value = null
+                        isPointAdding.value = false
+                    },
+                    onConfirm = { description, imagePath ->
+                        val point = placemarkMapObject.geometry
+                        onConfirmCreatingTag(
+                            CreateTagData(
+                                latitude = point.latitude,
+                                longitude = point.longitude,
+                                description = description,
+                                imagePath = imagePath
+                            )
+                        )
+                    }
+                )
+            }
         }
-
     }
 }
 
@@ -161,10 +206,12 @@ fun TagMap(
 private fun SetupMap(
     moveCameraToUserState: MutableState<Point?>,
     mapViewState: MutableState<MapView?>,
-    fusedLocationClient: FusedLocationProviderClient
+    fusedLocationClient: FusedLocationProviderClient,
+    inputListener: InputListener
 ) {
     moveCameraToUserState.value?.let { point ->
         mapViewState.value.moveCamera(point = point, zoom = 16f)
+        moveCameraToUserState.value = null
     }
 
     RequestCoarseLocation()
@@ -178,6 +225,7 @@ private fun SetupMap(
     DisposableEffect(key1 = LocalLifecycleOwner.current) {
         onDispose {
             mapViewState.value?.onStop()
+            mapViewState.value?.mapWindow?.map?.removeInputListener(inputListener)
         }
     }
 }

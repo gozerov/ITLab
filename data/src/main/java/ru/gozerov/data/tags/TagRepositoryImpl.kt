@@ -29,7 +29,6 @@ class TagRepositoryImpl @Inject constructor(
                 val response = tagRemote.getTagsAuthorized(token)
                 response
                     .onSuccess {
-                        Log.e("AAA", it.filter { it.isLiked }.toString())
                         emit(GetTagsResult.Success(it))
                     }
                     .onFailure {
@@ -59,6 +58,7 @@ class TagRepositoryImpl @Inject constructor(
                         latitude = createTagData.latitude,
                         longitude = createTagData.longitude,
                         description = createTagData.description,
+                        imagePath = createTagData.imagePath,
                         accessToken = token
                     )
                     response
@@ -71,9 +71,10 @@ class TagRepositoryImpl @Inject constructor(
                 }
                 else {
                     val response = tagRemote.createTag(
-                        createTagData.latitude,
-                        createTagData.longitude,
-                        createTagData.description
+                        latitude = createTagData.latitude,
+                        longitude = createTagData.longitude,
+                        description = createTagData.description,
+                        imagePath = createTagData.imagePath
                     )
                     response
                         .onSuccess { tag ->

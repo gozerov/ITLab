@@ -6,6 +6,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
@@ -13,6 +14,7 @@ import ru.gozerov.presentation.ui.theme.ITLabTheme
 fun DefaultMapButton(
     modifier: Modifier,
     @DrawableRes iconId: Int,
+    tint: Color = ITLabTheme.colors.primaryText,
     onClick: () -> Unit
 ) {
     FilledIconButton(
@@ -27,7 +29,7 @@ fun DefaultMapButton(
         Icon(
             painter = painterResource(id = iconId),
             contentDescription = null,
-            tint = ITLabTheme.colors.primaryText
+            tint = tint
         )
     }
 }

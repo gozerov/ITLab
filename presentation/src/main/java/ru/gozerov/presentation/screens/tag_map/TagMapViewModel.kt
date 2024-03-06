@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.gozerov.domain.models.tags.CreateTagData
 import ru.gozerov.domain.models.tags.DeleteLikeResult
 import ru.gozerov.domain.models.tags.GetTagsResult
 import ru.gozerov.domain.models.tags.LikeTagResult
@@ -41,10 +42,11 @@ class TagMapViewModel @Inject constructor(
 
     fun handleIntent(intent: TagMapIntent) {
         viewModelScope.launch {
-            when(intent) {
+            when (intent) {
                 is TagMapIntent.LoadTags -> getTags.execute(Unit)
                 is TagMapIntent.LikeTag -> likeTag.execute(intent.tag.id)
                 is TagMapIntent.UnlikeTag -> deleteLike.execute(intent.tag)
+                is TagMapIntent.CreateTag -> createTag.execute(intent.createTagData)
             }
         }
     }
@@ -52,7 +54,7 @@ class TagMapViewModel @Inject constructor(
     private fun CoroutineScope.observeGetTagsResult() {
         launch {
             getTags.result.collect { result ->
-                when(result) {
+                when (result) {
                     is GetTagsResult.Success -> {
                         _viewState.emit(TagMapViewState.TagsOnMap(result.tags))
                     }
@@ -68,7 +70,7 @@ class TagMapViewModel @Inject constructor(
     private fun CoroutineScope.observeLikeTagResult() {
         launch {
             likeTag.result.collect { result ->
-                when(result) {
+                when (result) {
                     is LikeTagResult.Success -> {
                         _viewState.emit(TagMapViewState.UpdateChosenTag(result.tag))
                     }
@@ -84,7 +86,7 @@ class TagMapViewModel @Inject constructor(
     private fun CoroutineScope.observeDeleteLikeTagResult() {
         launch {
             deleteLike.result.collect { result ->
-                when(result) {
+                when (result) {
                     is DeleteLikeResult.Success -> {
                         _viewState.emit(TagMapViewState.UpdateChosenTag(result.tag))
                     }

@@ -1,24 +1,17 @@
 package ru.gozerov.presentation.screens.tag_map
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.TextButton
-import androidx.compose.material3.Text
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.yandex.mapkit.geometry.Point
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
@@ -39,6 +32,7 @@ fun TagMapScreen(
 
     val moveCameraToUserState: MutableState<Point?> = remember { mutableStateOf(null) }
     val isSetupSystemBarsNeeded = remember { mutableStateOf(false) }
+    val isPointAdding = remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -49,6 +43,7 @@ fun TagMapScreen(
 
         LaunchedEffect(key1 = null) {
             viewModel.handleIntent(TagMapIntent.LoadTags)
+            //viewModel.handleIntent(TagMapIntent.CreateTag(55.1313, 49.1623, "description"))
         }
 
         TagMap(
@@ -57,6 +52,7 @@ fun TagMapScreen(
             pickedTag = pickedTag,
             moveCameraToUserState = moveCameraToUserState,
             isSetupSystemBarsNeeded = isSetupSystemBarsNeeded,
+            isPointAdding = isPointAdding,
             onPickedTagDismiss = {
                 moveCameraToUserState.value = null
                 pickedTag.value = null
@@ -69,6 +65,9 @@ fun TagMapScreen(
                 else
                     viewModel.handleIntent(TagMapIntent.UnlikeTag(tag))
                 isLikedState.value = !isLikedState.value
+            },
+            onConfirmCreatingTag = {
+                viewModel.handleIntent(TagMapIntent.CreateTag(it))
             }
         )
 
@@ -85,50 +84,4 @@ fun TagMapScreen(
             is TagMapViewState.Error -> {}
         }
     }
-}
-
-/*if (openTagDetails) {
-    AlertDialogExample(
-        onDismissRequest = {  },
-        onConfirmation = {  },
-        dialogTitle = "Title",
-        dialogText = "Description"
-    )
-}*/
-@Composable
-fun AlertDialogExample(
-    onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit,
-    dialogTitle: String,
-    dialogText: String
-) {
-    AlertDialog(
-        title = {
-            Text(text = dialogTitle)
-        },
-        text = {
-            Text(text = dialogText)
-        },
-        onDismissRequest = {
-            onDismissRequest()
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onConfirmation()
-                }
-            ) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    onDismissRequest()
-                }
-            ) {
-                Text("Dismiss")
-            }
-        }
-    )
 }
