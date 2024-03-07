@@ -15,17 +15,17 @@ import ru.gozerov.data.tags.remote.models.TagResponseBody
 
 interface TagApi {
 
-    @GET("api/tags")
+    @GET("api/tags/")
     suspend fun getTags(): Result<List<TagResponseBody>>
 
-    @GET("api/tags")
+    @GET("api/tags/")
     suspend fun getTagsAuthorized(
         @Header("Authorization") bearer: String
     ): Result<List<TagResponseBody>>
 
     @Multipart
     @FormUrlEncoded
-    @POST("api/tags")
+    @POST("api/tags/")
     suspend fun createTag(
         @Field("latitude") latitude: Double,
         @Field("longitude") longitude: Double,
@@ -34,7 +34,7 @@ interface TagApi {
     ): Result<TagResponseBody>
 
     @Multipart
-    @POST("api/tags")
+    @POST("api/tags/")
     suspend fun createTagAuthorized(
         @Header("Authorization") bearer: String,
         @Part("latitude") latitude: RequestBody,

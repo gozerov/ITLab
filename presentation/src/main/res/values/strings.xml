@@ -20,4 +20,5 @@
     <string name="cancel">Отмена</string>
     <string name="create">Создать</string>
     <string name="choose_file">Выбрать файл</string>
+    <string name="remove">Удалить</string>
 </resources>
