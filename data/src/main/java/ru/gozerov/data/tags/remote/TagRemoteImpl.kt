@@ -82,7 +82,7 @@ class TagRemoteImpl @Inject constructor(
             val file = File(filesDir, "image.png")
             val inputStream = context.contentResolver.openInputStream(uri)
             val outputStream = FileOutputStream(file)
-            inputStream!!.copyTo(outputStream)
+            inputStream?.copyTo(outputStream)
             val requestBody = file.asRequestBody("image/*".toMediaTypeOrNull())
             part = MultipartBody.Part.createFormData("image", file.name, requestBody)
         }

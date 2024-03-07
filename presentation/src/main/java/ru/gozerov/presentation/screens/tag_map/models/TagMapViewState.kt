@@ -4,7 +4,7 @@ import ru.gozerov.domain.models.tags.Tag
 
 sealed class TagMapViewState {
 
-    object None: TagMapViewState()
+    object None : TagMapViewState()
 
     class TagsOnMap(
         val tags: List<Tag>
@@ -14,6 +14,6 @@ sealed class TagMapViewState {
         val tag: Tag
     ) : TagMapViewState()
 
-    class Error: TagMapViewState()
+    class Error : TagMapViewState()
 
 }

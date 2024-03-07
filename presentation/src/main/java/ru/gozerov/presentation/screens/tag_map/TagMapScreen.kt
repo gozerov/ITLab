@@ -13,6 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.PlacemarkMapObject
+import com.yandex.mapkit.mapview.MapView
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.screens.tag_map.models.TagMapIntent
@@ -27,12 +29,16 @@ fun TagMapScreen(
     val snackbarScopeState = remember { SnackbarHostState() }
 
     val viewState = viewModel.viewState.collectAsState()
+    val mapViewState: MutableState<MapView?> = remember {
+        mutableStateOf(null)
+    }
     val tagListState: MutableState<List<Tag>> = remember { mutableStateOf(emptyList()) }
     val pickedTag: MutableState<Tag?> = remember { mutableStateOf(null) }
 
     val moveCameraToUserState: MutableState<Point?> = remember { mutableStateOf(null) }
     val isSetupSystemBarsNeeded = remember { mutableStateOf(false) }
     val isPointAdding = remember { mutableStateOf(false) }
+    val addingPoint: MutableState<PlacemarkMapObject?> = remember { mutableStateOf(null) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -48,11 +54,13 @@ fun TagMapScreen(
 
         TagMap(
             contentPadding = contentPadding,
+            mapViewState = mapViewState,
             tagState = tagListState,
             pickedTag = pickedTag,
             moveCameraToUserState = moveCameraToUserState,
             isSetupSystemBarsNeeded = isSetupSystemBarsNeeded,
             isPointAdding = isPointAdding,
+            addingPoint = addingPoint,
             onPickedTagDismiss = {
                 moveCameraToUserState.value = null
                 pickedTag.value = null
@@ -81,7 +89,11 @@ fun TagMapScreen(
                 pickedTag.value = (viewState.value as TagMapViewState.UpdateChosenTag).tag
             }
 
-            is TagMapViewState.Error -> {}
+            is TagMapViewState.Error -> {
+                addingPoint.value?.let { placemarkObject ->
+                    mapViewState.value?.mapWindow?.map?.mapObjects?.remove(placemarkObject)
+                }
+            }
         }
     }
 }

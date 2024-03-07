@@ -7,16 +7,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -56,25 +58,22 @@ private val mapObjectTapListener = object : MapObjectTapListener {
 @Composable
 fun TagMap(
     contentPadding: PaddingValues,
+    mapViewState: MutableState<MapView?>,
     tagState: MutableState<List<Tag>>,
     onLikeClicked: (tag: Tag, isLikedState: MutableState<Boolean>) -> Unit,
     pickedTag: MutableState<Tag?>,
     moveCameraToUserState: MutableState<Point?>,
     isSetupSystemBarsNeeded: MutableState<Boolean>,
     isPointAdding: MutableState<Boolean>,
+    addingPoint: MutableState<PlacemarkMapObject?>,
     onPickedTagDismiss: () -> Unit,
     onConfirmCreatingTag: (createTagData: CreateTagData) -> Unit
 ) {
     val context = LocalContext.current
-    val mapViewState: MutableState<MapView?> = remember {
-        mutableStateOf(null)
-    }
-
     val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
 
     val tagBottomSheetState = rememberModalBottomSheetState()
-    val addingPoint: MutableState<PlacemarkMapObject?> = remember { mutableStateOf(null) }
 
     tagState.value.forEach { tag ->
         mapViewState.value?.mapWindow?.map?.mapObjects?.addPlacemark {
@@ -128,32 +127,42 @@ fun TagMap(
                 }
             )
             Column {
-                DefaultMapButton(
-                    modifier = Modifier.padding(end = 8.dp),
-                    iconId = R.drawable.ic_add_24
+                Column(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .clip(RoundedCornerShape(100))
+                        .alpha(0.9f)
+                        .background(ITLabTheme.colors.primaryBackground)
                 ) {
-                    mapViewState.value?.run {
-                        moveCamera(
-                            point = mapWindow.map.cameraPosition.target,
-                            zoom = mapWindow.map.cameraPosition.zoom + 1
-                        )
+                    DefaultMapButton(
+                        modifier = Modifier,
+                        iconId = R.drawable.ic_add_24
+                    ) {
+                        mapViewState.value?.run {
+                            moveCamera(
+                                point = mapWindow.map.cameraPosition.target,
+                                zoom = mapWindow.map.cameraPosition.zoom + 1
+                            )
+                        }
+                    }
+
+                    DefaultMapButton(
+                        modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
+                        iconId = R.drawable.ic_remove_24
+                    ) {
+                        mapViewState.value?.run {
+                            moveCamera(
+                                point = mapWindow.map.cameraPosition.target,
+                                zoom = mapWindow.map.cameraPosition.zoom - 1
+                            )
+                        }
                     }
                 }
 
                 DefaultMapButton(
-                    modifier = Modifier.padding(end = 8.dp, top = 4.dp, bottom = 4.dp),
-                    iconId = R.drawable.ic_remove_24
-                ) {
-                    mapViewState.value?.run {
-                        moveCamera(
-                            point = mapWindow.map.cameraPosition.target,
-                            zoom = mapWindow.map.cameraPosition.zoom - 1
-                        )
-                    }
-                }
-
-                DefaultMapButton(
-                    modifier = Modifier.padding(end = 8.dp, top = 4.dp),
+                    modifier = Modifier
+                        .padding(top = 8.dp, end = 4.dp)
+                        .size(48.dp),
                     iconId = R.drawable.ic_location_24
                 ) {
                     fusedLocationClient.getLocation { loc ->
@@ -162,7 +171,9 @@ fun TagMap(
                 }
 
                 DefaultMapButton(
-                    modifier = Modifier.padding(end = 8.dp, top = 32.dp),
+                    modifier = Modifier
+                        .padding(end = 4.dp, top = 8.dp)
+                        .size(48.dp),
                     iconId = R.drawable.ic_add_location_24,
                     tint = if (isPointAdding.value) ITLabTheme.colors.tintColor else ITLabTheme.colors.primaryText
                 ) {
@@ -180,8 +191,11 @@ fun TagMap(
             }
             addingPoint.value?.let { placemarkMapObject ->
                 CreateTagDialog(
-                    onDismiss = {
-                        mapViewState.value?.mapWindow?.map?.mapObjects?.remove(placemarkMapObject)
+                    onDismiss = { isConfirmed ->
+                        if (!isConfirmed)
+                            mapViewState.value?.mapWindow?.map?.mapObjects?.remove(
+                                placemarkMapObject
+                            )
                         addingPoint.value = null
                         isPointAdding.value = false
                     },

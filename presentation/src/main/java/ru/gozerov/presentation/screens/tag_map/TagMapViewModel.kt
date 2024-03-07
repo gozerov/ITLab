@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.gozerov.domain.models.tags.CreateTagData
+import ru.gozerov.domain.models.tags.CreateTagResult
 import ru.gozerov.domain.models.tags.DeleteLikeResult
 import ru.gozerov.domain.models.tags.GetTagsResult
 import ru.gozerov.domain.models.tags.LikeTagResult
@@ -37,6 +37,7 @@ class TagMapViewModel @Inject constructor(
             observeGetTagsResult()
             observeLikeTagResult()
             observeDeleteLikeTagResult()
+            observeCreateTagResult()
         }
     }
 
@@ -92,6 +93,22 @@ class TagMapViewModel @Inject constructor(
                     }
 
                     is DeleteLikeResult.Error -> {
+                        _viewState.emit(TagMapViewState.Error())
+                    }
+                }
+            }
+        }
+    }
+
+    private fun CoroutineScope.observeCreateTagResult() {
+        launch {
+            createTag.result.collect { result ->
+                when (result) {
+                    is CreateTagResult.Success -> {
+                        getTags.execute(Unit)
+                    }
+
+                    is CreateTagResult.Error -> {
                         _viewState.emit(TagMapViewState.Error())
                     }
                 }
