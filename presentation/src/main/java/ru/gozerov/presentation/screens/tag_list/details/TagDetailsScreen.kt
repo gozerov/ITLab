@@ -1,7 +1,6 @@
 package ru.gozerov.presentation.screens.tag_list.details
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -57,7 +56,7 @@ fun TagDetailsScreen(
             TagDetailsView(
                 tagDetails = tagDetails,
                 isTagLiked = isTagLiked,
-                onTagClick =  {
+                onTagClick = {
                     if (!it.isLiked)
                         viewModel.handleIntent(TagDetailsIntent.LikeTag(it.id))
                     else
@@ -65,7 +64,7 @@ fun TagDetailsScreen(
                     isTagLiked = !isTagLiked
                 },
                 onDeleteTagClick = {
-
+                    viewModel.handleIntent(TagDetailsIntent.DeleteTag(it.id))
                 }
             )
 
@@ -73,13 +72,15 @@ fun TagDetailsScreen(
 
     }
     when (viewState) {
-        is TagDetailsViewState.None -> { }
+        is TagDetailsViewState.None -> {}
         is TagDetailsViewState.UpdatedTag -> {
             currentTagDetails.value = viewState.tagDetails
         }
-        is TagDetailsViewState.TagHasBeenDeleted -> {
 
+        is TagDetailsViewState.TagHasBeenDeleted -> {
+            navController.popBackStack()
         }
+
         is TagDetailsViewState.Error -> {
 
         }

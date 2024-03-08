@@ -1,5 +1,6 @@
 package ru.gozerov.data.tags
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -33,10 +34,8 @@ class TagRepositoryImpl @Inject constructor(
                 val response = tagRemote.getTagsAuthorized(token)
                 response
                     .onSuccess { tags ->
-                        launch {
-                            tagStorage.insertTags(tags)
-                        }
                         emit(GetTagsResult.Success(tags))
+                        tagStorage.insertTags(tags)
                     }
                     .onFailure {
                         emit(GetTagsResult.Error)

@@ -28,7 +28,8 @@ class UserStorageImpl @Inject constructor(
     override suspend fun isLoggedUserAuthor(tag: Tag): Boolean {
         val tagUser = tag.user ?: return false
         val token = getCurrentAccessToken() ?: return false
-        return userDao.getUserByToken(token).username == tagUser.username
+        val user = userDao.getUserByToken(token)
+        return user?.username == tagUser.username
     }
 
     override suspend fun saveUser(token: String, username: String) {
@@ -37,7 +38,7 @@ class UserStorageImpl @Inject constructor(
     }
 
     override suspend fun getUsers(): Flow<List<User>> {
-        return userDao.getUsers().map { list -> list.map { userEntity ->  userEntity.toUser() } }
+        return userDao.getUsers().map { list -> list.map { userEntity -> userEntity.toUser() } }
     }
 
     override suspend fun deleteUser(username: String) {

@@ -23,7 +23,7 @@ fun TagEntity.toTag(): Tag =
         latitude,
         longitude,
         description,
-        image?.let { "https://maps.rtuitlab.dev$image" },
+        image,
         likes,
         isLiked,
         username?.let { User(it) }
@@ -36,7 +36,7 @@ fun Tag.toTagEntity(): TagEntity =
         latitude,
         longitude,
         description,
-        image?.let { "https://maps.rtuitlab.dev$image" },
+        image,
         likes,
         isLiked,
         user?.username

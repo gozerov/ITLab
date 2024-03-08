@@ -129,18 +129,26 @@ fun TagDetailsView(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_delete),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = ITLabTheme.colors.controlColor
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                onClick = { }
-            ) {
-                Text(text = stringResource(id = R.string.subscribe_on_author))
+            else {
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.tintColor),
+                    onClick = { }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.subscribe_on_author),
+                        color = ITLabTheme.colors.primaryText
+                    )
+                }
             }
         }
     }

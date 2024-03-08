@@ -19,7 +19,7 @@ interface UserDao {
     suspend fun getUserByName(username: String): UserEntity
 
     @Query("SELECT * FROM users WHERE token = :token")
-    fun getUserByToken(token: String): UserEntity
+    suspend fun getUserByToken(token: String): UserEntity?
 
     @Query("DELETE FROM users WHERE username = :name")
     suspend fun deleteUserByName(name: String)
