@@ -10,6 +10,8 @@ sealed class Screen(
     object ChooseAccount : Screen("choose_account")
     object MainSection : Screen("main_section")
 
+    object TagList : Screen("list")
+
     object TagDetails : Screen("tag_details")
 
 }

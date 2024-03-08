@@ -13,9 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.core.os.bundleOf
 import androidx.navigation.NavController
-import androidx.navigation.navArgument
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.navigation.Screen
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
@@ -33,6 +31,7 @@ fun TagListScreen(
     SetupSystemBars()
     val tagState = remember { mutableStateOf<List<Tag>>(emptyList()) }
     val snackbarScopeState = remember { SnackbarHostState() }
+    val viewState = viewModel.viewState.collectAsState().value
 
     LaunchedEffect(key1 = null) {
         viewModel.handleIntent(TagListIntent.LoadTags)
@@ -48,17 +47,19 @@ fun TagListScreen(
     ) { contentPadding ->
 
         TagListView(tagList = tagState.value) { tag ->
-            navController.currentBackStackEntry?.arguments?.putParcelable("tag", tag)
+            navController.currentBackStackEntry?.savedStateHandle?.apply {
+                set("tag", tag)
+            }
             navController.navigate(Screen.TagDetails.route)
         }
     }
 
-    val viewState = viewModel.viewState.collectAsState()
-    when(viewState.value) {
+    when (viewState) {
         is TagListViewState.None -> {}
         is TagListViewState.TagList -> {
-            tagState.value = (viewState.value as TagListViewState.TagList).tags
+            tagState.value = viewState.tags
         }
+
         is TagListViewState.Error -> {
 
         }

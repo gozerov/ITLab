@@ -28,7 +28,7 @@ fun TagMapScreen(
     SetupSystemBars(statusBarColor = Color.Transparent)
     val snackbarScopeState = remember { SnackbarHostState() }
 
-    val viewState = viewModel.viewState.collectAsState()
+    val viewState = viewModel.viewState.collectAsState().value
     val mapViewState: MutableState<MapView?> = remember {
         mutableStateOf(null)
     }
@@ -78,14 +78,14 @@ fun TagMapScreen(
             }
         )
 
-        when (viewState.value) {
+        when (viewState) {
             is TagMapViewState.None -> {}
             is TagMapViewState.TagsOnMap -> {
-                tagListState.value = (viewState.value as TagMapViewState.TagsOnMap).tags
+                tagListState.value = viewState.tags
             }
 
             is TagMapViewState.UpdateChosenTag -> {
-                pickedTag.value = (viewState.value as TagMapViewState.UpdateChosenTag).tag
+                pickedTag.value = viewState.tag
             }
 
             is TagMapViewState.Error -> {

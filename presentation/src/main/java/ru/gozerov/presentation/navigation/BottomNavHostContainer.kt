@@ -4,11 +4,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.screens.account.AccountScreen
@@ -32,8 +29,8 @@ fun BottomNavHostContainer(
                 val tagMapViewModel = hiltViewModel<TagMapViewModel>()
                 TagMapScreen(tagMapViewModel)
             }
-            navigation(BottomNavBarItem.TagList.route, "tagListFlow") {
-                composable(BottomNavBarItem.TagList.route) {
+            navigation(Screen.TagList.route, BottomNavBarItem.TagListFlow.route) {
+                composable(Screen.TagList.route) {
                     val tagListViewModel = hiltViewModel<TagListViewModel>()
                     TagListScreen(navController, tagListViewModel, padding)
                 }
@@ -41,13 +38,17 @@ fun BottomNavHostContainer(
                     route = Screen.TagDetails.route,
                 ) { backStackEntry ->
                     val tagDetailsViewModel = hiltViewModel<TagDetailsViewModel>()
-                    backStackEntry.arguments?.getParcelable<Tag>("tag")?.let { tag ->
+                    val tag =
+                        navController.previousBackStackEntry?.savedStateHandle?.get<Tag>("tag")
+                    tag?.let {
                         TagDetailsScreen(
                             paddingValues = padding,
                             viewModel = tagDetailsViewModel,
+                            navController = navController,
                             tag = tag
                         )
                     }
+
                 }
             }
 

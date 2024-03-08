@@ -1,6 +1,5 @@
 package ru.gozerov.presentation.screens.tag_list.list.views
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,7 +31,6 @@ import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @Composable
 fun TagCard(tag: Tag, onTagClick: (tag: Tag) -> Unit) {
-    Log.e("AAA", tag.toString())
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -44,15 +43,24 @@ fun TagCard(tag: Tag, onTagClick: (tag: Tag) -> Unit) {
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(12.dp)),
-            model = tag.image,
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            error = painterResource(id = R.drawable.ic_blank_image)
-        )
+        val imageSource = tag.image
+        if (imageSource != null) {
+            AsyncImage(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                model = tag.image,
+                contentScale = ContentScale.Crop,
+                contentDescription = null
+            )
+        } else {
+            Icon(
+                modifier = Modifier.size(48.dp),
+                painter = painterResource(id = R.drawable.ic_blank_image),
+                contentDescription = null,
+                tint = ITLabTheme.colors.primaryBackground
+            )
+        }
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             tag.user?.username?.let { username ->
@@ -79,7 +87,5 @@ fun TagCard(tag: Tag, onTagClick: (tag: Tag) -> Unit) {
                 maxLines = 1
             )
         }
-
-
     }
 }

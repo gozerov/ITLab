@@ -28,6 +28,7 @@ fun ChooseAccountScreen(navController: NavController, viewModel: ChooseAccountVi
     val coroutineScope = rememberCoroutineScope()
     val snackbarScopeState = remember { SnackbarHostState() }
     var isListEmptyState by remember { mutableStateOf(false) }
+    val viewState = viewModel.viewState.collectAsState().value
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = {
@@ -38,7 +39,6 @@ fun ChooseAccountScreen(navController: NavController, viewModel: ChooseAccountVi
         LaunchedEffect(key1 = null) {
             viewModel.handleIntent(ChooseAccountIntent.GetUsers)
         }
-        val viewState = viewModel.viewState.collectAsState()
         AccountsList(
             contentPadding = contentPadding,
             userList = userList,
@@ -54,14 +54,14 @@ fun ChooseAccountScreen(navController: NavController, viewModel: ChooseAccountVi
             }
         )
 
-        when (viewState.value) {
+        when (viewState) {
             is ChooseAccountViewState.None -> {}
             is ChooseAccountViewState.EmptyList -> {
                 isListEmptyState = true
             }
 
             is ChooseAccountViewState.UserList -> {
-                userList.value = (viewState.value as ChooseAccountViewState.UserList).users
+                userList.value = viewState.users
             }
 
             is ChooseAccountViewState.SuccessLogin -> {

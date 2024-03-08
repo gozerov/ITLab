@@ -27,13 +27,13 @@ fun LoginScreen(
     val coroutineScope = rememberCoroutineScope()
     val snackbarScopeState = remember { SnackbarHostState() }
     val isLoadingState = remember { mutableStateOf(false) }
+    val viewState = viewModel.viewState.collectAsState().value
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = {
             SnackbarHost(snackbarScopeState)
         }
     ) { contentPadding ->
-        val viewState = viewModel.viewState.collectAsState()
         LoginForm(
             contentPadding = contentPadding,
             isLoadingState = isLoadingState,
@@ -44,7 +44,7 @@ fun LoginScreen(
                 viewModel.handleIntent(LoginIntent.PerformRegister(username, password))
             }
         )
-        when (viewState.value) {
+        when (viewState) {
             is LoginViewState.None -> {}
             is LoginViewState.Success -> {
                 navController.navigate(Screen.MainSection.route)
