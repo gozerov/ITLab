@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.gozerov.domain.models.tags.DeleteLikeResult
 import ru.gozerov.domain.models.tags.DeleteTagResult
+import ru.gozerov.domain.models.tags.GetTagDetailsResult
 import ru.gozerov.domain.models.tags.LikeTagResult
 import ru.gozerov.domain.usecases.tags.DeleteLike
 import ru.gozerov.domain.usecases.tags.DeleteTag
+import ru.gozerov.domain.usecases.tags.GetTagDetails
 import ru.gozerov.domain.usecases.tags.LikeTag
 import ru.gozerov.presentation.screens.tag_list.details.models.TagDetailsIntent
 import ru.gozerov.presentation.screens.tag_list.details.models.TagDetailsViewState
@@ -22,7 +24,8 @@ import javax.inject.Inject
 class TagDetailsViewModel @Inject constructor(
     private val likeTag: LikeTag,
     private val deleteLike: DeleteLike,
-    private val deleteTag: DeleteTag
+    private val deleteTag: DeleteTag,
+    private val getTagDetails: GetTagDetails
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<TagDetailsViewState>(TagDetailsViewState.None)
@@ -31,6 +34,7 @@ class TagDetailsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            observeGetTagDetailsResult()
             observeLikeTagResult()
             observeDeleteLikeResult()
             observeDeleteTagResult()
@@ -40,6 +44,7 @@ class TagDetailsViewModel @Inject constructor(
     fun handleIntent(intent: TagDetailsIntent) {
         viewModelScope.launch {
             when (intent) {
+                is TagDetailsIntent.LoadTag -> getTagDetails.execute(intent.id)
                 is TagDetailsIntent.LikeTag -> likeTag.execute(intent.id)
                 is TagDetailsIntent.UnlikeTag -> deleteLike.execute(intent.tag)
                 is TagDetailsIntent.DeleteTag -> deleteTag.execute(intent.id)
@@ -48,14 +53,28 @@ class TagDetailsViewModel @Inject constructor(
 
     }
 
+    private fun CoroutineScope.observeGetTagDetailsResult() {
+        launch {
+            getTagDetails.result.collect { result ->
+                when (result) {
+                    is GetTagDetailsResult.Success -> {
+                        _viewState.emit(TagDetailsViewState.UpdatedTag(result.tagDetails))
+                    }
+
+                    is GetTagDetailsResult.Error -> {
+                        _viewState.emit(TagDetailsViewState.Error())
+                    }
+                }
+            }
+        }
+    }
+
     private fun CoroutineScope.observeLikeTagResult() {
         launch {
             likeTag.result.collect { result ->
                 when (result) {
                     is LikeTagResult.Success -> _viewState.emit(
-                        TagDetailsViewState.UpdatedTag(
-                            result.tag
-                        )
+                        TagDetailsViewState.UpdatedTag(result.tagDetails)
                     )
 
                     is LikeTagResult.Error -> _viewState.emit(TagDetailsViewState.Error())
@@ -69,9 +88,7 @@ class TagDetailsViewModel @Inject constructor(
             deleteLike.result.collect { result ->
                 when (result) {
                     is DeleteLikeResult.Success -> _viewState.emit(
-                        TagDetailsViewState.UpdatedTag(
-                            result.tag
-                        )
+                        TagDetailsViewState.UpdatedTag(result.tagDetails)
                     )
 
                     is DeleteLikeResult.Error -> _viewState.emit(TagDetailsViewState.Error())

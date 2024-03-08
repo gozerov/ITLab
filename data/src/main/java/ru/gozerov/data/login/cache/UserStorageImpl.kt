@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.map
 import ru.gozerov.data.login.cache.room.UserDao
 import ru.gozerov.data.login.cache.room.UserEntity
 import ru.gozerov.data.utils.ApiConstants
+import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.domain.models.users.User
 import javax.inject.Inject
 
@@ -22,6 +23,12 @@ class UserStorageImpl @Inject constructor(
             .edit()
             .putString(ApiConstants.KEY_ACCESS_TOKEN, token)
             .apply()
+    }
+
+    override suspend fun isLoggedUserAuthor(tag: Tag): Boolean {
+        val tagUser = tag.user ?: return false
+        val token = getCurrentAccessToken() ?: return false
+        return userDao.getUserByToken(token).username == tagUser.username
     }
 
     override suspend fun saveUser(token: String, username: String) {

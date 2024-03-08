@@ -1,25 +1,29 @@
 package ru.gozerov.data.tags
 
-import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.gozerov.data.login.cache.UserStorage
+import ru.gozerov.data.tags.cache.TagStorage
 import ru.gozerov.data.tags.remote.TagRemote
 import ru.gozerov.domain.models.tags.CreateTagData
 import ru.gozerov.domain.models.tags.CreateTagResult
 import ru.gozerov.domain.models.tags.DeleteLikeResult
 import ru.gozerov.domain.models.tags.DeleteTagResult
+import ru.gozerov.domain.models.tags.GetTagDetailsResult
 import ru.gozerov.domain.models.tags.GetTagsResult
 import ru.gozerov.domain.models.tags.LikeTagResult
 import ru.gozerov.domain.models.tags.Tag
+import ru.gozerov.domain.models.tags.TagDetails
 import ru.gozerov.domain.repositories.TagRepository
 import javax.inject.Inject
 
 class TagRepositoryImpl @Inject constructor(
     private val tagRemote: TagRemote,
-    private val userStorage: UserStorage
+    private val userStorage: UserStorage,
+    private val tagStorage: TagStorage
 ) : TagRepository {
 
     override suspend fun getTags(): Flow<GetTagsResult> = withContext(Dispatchers.IO) {
@@ -28,11 +32,13 @@ class TagRepositoryImpl @Inject constructor(
             if (token != null) {
                 val response = tagRemote.getTagsAuthorized(token)
                 response
-                    .onSuccess {
-                        emit(GetTagsResult.Success(it))
+                    .onSuccess { tags ->
+                        launch {
+                            tagStorage.insertTags(tags)
+                        }
+                        emit(GetTagsResult.Success(tags))
                     }
                     .onFailure {
-                        Log.e("AA", it.message.toString())
                         emit(GetTagsResult.Error)
                     }
             } else {
@@ -42,12 +48,20 @@ class TagRepositoryImpl @Inject constructor(
                         emit(GetTagsResult.Success(it))
                     }
                     .onFailure {
-                        Log.e("AA", it.message.toString())
                         emit(GetTagsResult.Error)
                     }
             }
         }
     }
+
+    override suspend fun getTagDetailsById(id: String): Flow<GetTagDetailsResult> =
+        withContext(Dispatchers.IO) {
+            return@withContext flow<GetTagDetailsResult> {
+                val tag = tagStorage.getTagById(id)
+                val isLoggedUserAuthor = userStorage.isLoggedUserAuthor(tag)
+                emit(GetTagDetailsResult.Success(TagDetails(tag, isLoggedUserAuthor)))
+            }
+        }
 
     override suspend fun createTag(createTagData: CreateTagData): Flow<CreateTagResult> =
         withContext(Dispatchers.IO) {
@@ -68,13 +82,12 @@ class TagRepositoryImpl @Inject constructor(
                         .onFailure {
                             emit(CreateTagResult.Error)
                         }
-                }
-                else {
+                } else {
                     val response = tagRemote.createTag(
                         latitude = createTagData.latitude,
                         longitude = createTagData.longitude,
                         description = createTagData.description,
-                        //imagePath = createTagData.imageBody
+                        imageUri = createTagData.imageUri
                     )
                     response
                         .onSuccess { tag ->
@@ -110,8 +123,9 @@ class TagRepositoryImpl @Inject constructor(
             token?.let {
                 val response = tagRemote.likeTagAuthorized(tagId, token)
                 response
-                    .onSuccess {
-                        emit(LikeTagResult.Success(it))
+                    .onSuccess { tag ->
+                        val isLoggedUserAuthor = userStorage.isLoggedUserAuthor(tag)
+                        emit(LikeTagResult.Success(TagDetails(tag, isLoggedUserAuthor)))
                     }
                     .onFailure {
                         emit(LikeTagResult.Error)
@@ -128,7 +142,14 @@ class TagRepositoryImpl @Inject constructor(
                     val response = tagRemote.deleteLikeAuthorized(tag.id, token)
                     response
                         .onSuccess {
-                            emit(DeleteLikeResult.Success(tag.copy(isLiked = false, likes = tag.likes - 1)))
+                            val newTag = tag.copy(
+                                isLiked = false,
+                                likes = tag.likes - 1
+                            )
+                            val isLoggedUserAuthor = userStorage.isLoggedUserAuthor(newTag)
+                            emit(
+                                DeleteLikeResult.Success(TagDetails(newTag, isLoggedUserAuthor))
+                            )
                         }
                         .onFailure {
                             emit(DeleteLikeResult.Error)

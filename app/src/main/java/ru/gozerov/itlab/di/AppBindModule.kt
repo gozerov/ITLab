@@ -10,6 +10,8 @@ import ru.gozerov.data.login.cache.UserStorageImpl
 import ru.gozerov.data.login.remote.LoginRemote
 import ru.gozerov.data.login.remote.LoginRemoteImpl
 import ru.gozerov.data.tags.TagRepositoryImpl
+import ru.gozerov.data.tags.cache.TagStorage
+import ru.gozerov.data.tags.cache.TagStorageImpl
 import ru.gozerov.data.tags.remote.TagRemote
 import ru.gozerov.data.tags.remote.TagRemoteImpl
 import ru.gozerov.domain.repositories.LoginRepository
@@ -39,5 +41,9 @@ interface AppBindModule {
     @Binds
     @Singleton
     fun bindUserStorageImplToUserStorage(userStorageImpl: UserStorageImpl): UserStorage
+
+    @Binds
+    @Singleton
+    fun bindTagStorageImplToTagStorage(tagStorageImpl: TagStorageImpl): TagStorage
 
 }

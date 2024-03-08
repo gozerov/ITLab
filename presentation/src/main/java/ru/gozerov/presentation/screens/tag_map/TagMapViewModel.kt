@@ -73,7 +73,7 @@ class TagMapViewModel @Inject constructor(
             likeTag.result.collect { result ->
                 when (result) {
                     is LikeTagResult.Success -> {
-                        _viewState.emit(TagMapViewState.UpdateChosenTag(result.tag))
+                        _viewState.emit(TagMapViewState.UpdateChosenTag(result.tagDetails.tag))
                     }
 
                     is LikeTagResult.Error -> {
@@ -89,7 +89,7 @@ class TagMapViewModel @Inject constructor(
             deleteLike.result.collect { result ->
                 when (result) {
                     is DeleteLikeResult.Success -> {
-                        _viewState.emit(TagMapViewState.UpdateChosenTag(result.tag))
+                        _viewState.emit(TagMapViewState.UpdateChosenTag(result.tagDetails.tag))
                     }
 
                     is DeleteLikeResult.Error -> {

@@ -6,7 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import ru.gozerov.data.login.cache.room.UserDatabase
+import ru.gozerov.data.database.AppDatabase
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -14,6 +14,10 @@ class RoomModule {
 
     @Provides
     fun provideUserDao(@ApplicationContext context: Context) =
-        UserDatabase.getInstance(context).getUserDao()
+        AppDatabase.getInstance(context).getUserDao()
+
+    @Provides
+    fun provideTagDao(@ApplicationContext context: Context) =
+        AppDatabase.getInstance(context).getTagDao()
 
 }

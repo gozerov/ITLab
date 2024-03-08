@@ -1,7 +1,6 @@
 package ru.gozerov.data.login.cache.room
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -18,6 +17,9 @@ interface UserDao {
 
     @Query("SELECT * FROM users WHERE username = :username")
     suspend fun getUserByName(username: String): UserEntity
+
+    @Query("SELECT * FROM users WHERE token = :token")
+    fun getUserByToken(token: String): UserEntity
 
     @Query("DELETE FROM users WHERE username = :name")
     suspend fun deleteUserByName(name: String)

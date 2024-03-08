@@ -5,13 +5,17 @@ import ru.gozerov.domain.models.tags.CreateTagData
 import ru.gozerov.domain.models.tags.CreateTagResult
 import ru.gozerov.domain.models.tags.DeleteLikeResult
 import ru.gozerov.domain.models.tags.DeleteTagResult
+import ru.gozerov.domain.models.tags.GetTagDetailsResult
 import ru.gozerov.domain.models.tags.GetTagsResult
 import ru.gozerov.domain.models.tags.LikeTagResult
 import ru.gozerov.domain.models.tags.Tag
+import ru.gozerov.domain.models.tags.TagDetails
 
 interface TagRepository : Repository {
 
     suspend fun getTags(): Flow<GetTagsResult>
+
+    suspend fun getTagDetailsById(id: String): Flow<GetTagDetailsResult>
 
     suspend fun createTag(createTagData: CreateTagData): Flow<CreateTagResult>
 

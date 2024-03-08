@@ -27,13 +27,19 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import ru.gozerov.domain.models.tags.Tag
+import ru.gozerov.domain.models.tags.TagDetails
 import ru.gozerov.presentation.R
 import ru.gozerov.presentation.screens.shared.DefaultImage
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun TagDetailsView(tag: Tag, isTagLiked: Boolean, onTagClick: (tag: Tag) -> Unit) {
+fun TagDetailsView(
+    tagDetails: TagDetails,
+    isTagLiked: Boolean,
+    onTagClick: (tag: Tag) -> Unit,
+    onDeleteTagClick: (tag: Tag) -> Unit
+) {
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -45,7 +51,7 @@ fun TagDetailsView(tag: Tag, isTagLiked: Boolean, onTagClick: (tag: Tag) -> Unit
                 .scrollable(rememberScrollState(), Orientation.Vertical)
                 .padding(16.dp)
         ) {
-            val imageSource = tag.image
+            val imageSource = tagDetails?.tag?.image
             if (imageSource != null) {
                 DefaultImage(
                     source = imageSource,
@@ -64,7 +70,7 @@ fun TagDetailsView(tag: Tag, isTagLiked: Boolean, onTagClick: (tag: Tag) -> Unit
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            tag.user?.username?.let { username ->
+            tagDetails.tag.user?.username?.let { username ->
                 val annotatedString = buildAnnotatedString {
                     append(stringResource(id = R.string.author_is, username))
                     addStyle(
@@ -83,7 +89,7 @@ fun TagDetailsView(tag: Tag, isTagLiked: Boolean, onTagClick: (tag: Tag) -> Unit
             }
             Spacer(Modifier.height(16.dp))
             Text(
-                text = tag.description,
+                text = tagDetails.tag.description,
                 color = ITLabTheme.colors.primaryText,
             )
             Spacer(modifier = Modifier.height(32.dp))
@@ -102,7 +108,7 @@ fun TagDetailsView(tag: Tag, isTagLiked: Boolean, onTagClick: (tag: Tag) -> Unit
                 shape = RoundedCornerShape(16.dp),
                 border = likeBorderStroke,
                 colors = ButtonDefaults.buttonColors(containerColor = likeButtonColor),
-                onClick = { onTagClick(tag) }
+                onClick = { onTagClick(tagDetails.tag) }
             ) {
                 Icon(
                     painter = painterResource(likePainterResource),
@@ -110,17 +116,22 @@ fun TagDetailsView(tag: Tag, isTagLiked: Boolean, onTagClick: (tag: Tag) -> Unit
                     tint = likeIconColor
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                onClick = { }
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_delete),
-                    contentDescription = null
-                )
+            if (tagDetails.isLoggedUserAuthor) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(2.dp, ITLabTheme.colors.controlColor),
+                    colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.primaryBackground),
+                    onClick = { onDeleteTagClick(tagDetails.tag) }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_delete),
+                        contentDescription = null
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(8.dp))
             Button(
