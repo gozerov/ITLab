@@ -29,7 +29,6 @@ import com.google.android.gms.location.LocationServices
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.InputListener
 import com.yandex.mapkit.map.Map
-import com.yandex.mapkit.map.MapObject
 import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
@@ -45,21 +44,19 @@ import ru.gozerov.presentation.ui.theme.ITLabTheme
 import ru.gozerov.presentation.utils.getLocation
 import ru.gozerov.presentation.utils.moveCamera
 
-private val mapObjectTapListener = object : MapObjectTapListener {
-    override fun onMapObjectTap(mapObject: MapObject, point: Point): Boolean {
-        val (pickedState, tag) = mapObject.userData as TagData
-        pickedState.value = tag
-        return true
-    }
+private val mapObjectTapListener = MapObjectTapListener { mapObject, _ ->
+    val (pickedState, tag) = mapObject.userData as TagData
+    pickedState.value = tag
+    true
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TagMap(
+fun TagMapView(
     contentPadding: PaddingValues,
     mapViewState: MutableState<MapView?>,
-    tagState: MutableState<List<Tag>>,
+    tagList: List<Tag>,
     onLikeClicked: (tag: Tag, isLikedState: MutableState<Boolean>) -> Unit,
     pickedTag: MutableState<Tag?>,
     moveCameraToUserState: MutableState<Point?>,
@@ -75,7 +72,7 @@ fun TagMap(
 
     val tagBottomSheetState = rememberModalBottomSheetState()
 
-    tagState.value.forEach { tag ->
+    tagList.forEach { tag ->
         mapViewState.value?.mapWindow?.map?.mapObjects?.addPlacemark {
             it.geometry = Point(tag.latitude, tag.longitude)
             it.setIcon(ImageProvider.fromResource(context, R.drawable.ic_pin))

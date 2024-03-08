@@ -20,7 +20,7 @@ import ru.gozerov.presentation.ui.theme.ITLabTheme
 @Composable
 fun BottomNavigationBar(navController: NavController, contentPaddingValues: PaddingValues) {
     BottomNavigation(
-        modifier = Modifier.padding(contentPaddingValues),
+        modifier = Modifier.padding(bottom = contentPaddingValues.calculateBottomPadding()),
         backgroundColor = ITLabTheme.colors.primaryBackground,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()

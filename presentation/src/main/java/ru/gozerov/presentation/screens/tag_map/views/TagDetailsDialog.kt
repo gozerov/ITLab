@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -102,9 +101,9 @@ private fun TagDetailsCard(
                 SubcomposeAsyncImage(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 300.dp),
+                        .height(300.dp),
                     contentScale = ContentScale.Crop,
-                    model = "https://maps.rtuitlab.dev$it",
+                    model = it,
                     contentDescription = null,
                     success = {
                         Image(
@@ -132,7 +131,6 @@ private fun TagDetailsCard(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
-
         }
         Row(
             modifier = Modifier

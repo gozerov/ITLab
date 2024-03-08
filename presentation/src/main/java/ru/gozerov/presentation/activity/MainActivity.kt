@@ -13,7 +13,6 @@ import androidx.navigation.compose.rememberNavController
 import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
 import ru.gozerov.presentation.navigation.NavHostContainer
-import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @AndroidEntryPoint

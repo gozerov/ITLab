@@ -17,7 +17,6 @@ fun NavHostContainer(
     navController: NavHostController,
     padding: PaddingValues
 ) {
-
     NavHost(
         navController = navController,
         startDestination = Screen.ChooseAccount.route,

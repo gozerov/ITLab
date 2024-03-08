@@ -19,7 +19,7 @@ import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.screens.tag_map.models.TagMapIntent
 import ru.gozerov.presentation.screens.tag_map.models.TagMapViewState
-import ru.gozerov.presentation.screens.tag_map.views.TagMap
+import ru.gozerov.presentation.screens.tag_map.views.TagMapView
 
 @Composable
 fun TagMapScreen(
@@ -49,13 +49,12 @@ fun TagMapScreen(
 
         LaunchedEffect(key1 = null) {
             viewModel.handleIntent(TagMapIntent.LoadTags)
-            //viewModel.handleIntent(TagMapIntent.CreateTag(55.1313, 49.1623, "description"))
         }
 
-        TagMap(
+        TagMapView(
             contentPadding = contentPadding,
             mapViewState = mapViewState,
-            tagState = tagListState,
+            tagList = tagListState.value,
             pickedTag = pickedTag,
             moveCameraToUserState = moveCameraToUserState,
             isSetupSystemBarsNeeded = isSetupSystemBarsNeeded,
