@@ -36,21 +36,22 @@ import ru.gozerov.presentation.ui.theme.ITLabTheme
 fun TagListView(
     tagList: List<Tag>,
     onTagClick: (tag: Tag) -> Unit,
-    onSearchTextChanged: (text: String) -> Unit
+    onSearchTextChanged: (text: String) -> Unit,
 ) {
     val searchState = remember { mutableStateOf("") }
+    val isFilterDialogVisible = remember { mutableStateOf(false) }
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         containerColor = ITLabTheme.colors.primaryBackground
     ) { paddingValues ->
         Column {
-            Row (
+            Row(
                 modifier = Modifier
                     .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
-            ){
+            ) {
                 SearchField(
                     modifier = Modifier
                         .padding(end = 16.dp)
@@ -59,7 +60,11 @@ fun TagListView(
                     hintStringRes = R.string.search,
                     onSearchTextChanged = onSearchTextChanged
                 )
-                IconButton(onClick = { }) {
+                IconButton(
+                    onClick = {
+                        isFilterDialogVisible.value = true
+                    }
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_filter_24),
                         contentDescription = null,
@@ -76,6 +81,11 @@ fun TagListView(
                 items(tagList.size) { index ->
                     TagCard(tag = tagList[index], onTagClick = onTagClick)
                 }
+            }
+        }
+        if (isFilterDialogVisible.value) {
+            FilterDialog {
+                isFilterDialogVisible.value = false
             }
         }
     }
