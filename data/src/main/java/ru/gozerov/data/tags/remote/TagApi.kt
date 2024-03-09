@@ -11,6 +11,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 import ru.gozerov.data.tags.remote.models.TagResponseBody
 
 interface TagApi {
@@ -19,8 +20,20 @@ interface TagApi {
     suspend fun getTags(): Result<List<TagResponseBody>>
 
     @GET("api/tags/")
+    suspend fun getTagsByUsername(
+        @Query("user__username") username: String
+    ): Result<List<TagResponseBody>>
+
+    @GET("api/tags/")
     suspend fun getTagsAuthorized(
         @Header("Authorization") bearer: String
+    ): Result<List<TagResponseBody>>
+
+
+    @GET("api/tags/")
+    suspend fun getTagsByUsernameAuthorized(
+        @Header("Authorization") bearer: String,
+        @Query("user__username") username: String
     ): Result<List<TagResponseBody>>
 
     @Multipart

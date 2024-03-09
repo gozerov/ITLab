@@ -46,12 +46,21 @@ fun TagListScreen(
         }
     ) { contentPadding ->
 
-        TagListView(tagList = tagState.value) { tag ->
-            navController.currentBackStackEntry?.savedStateHandle?.apply {
-                set("tag", tag)
+        TagListView(
+            tagList = tagState.value,
+            onTagClick = { tag ->
+                navController.currentBackStackEntry?.savedStateHandle?.apply {
+                    set("tag", tag)
+                }
+                navController.navigate(Screen.TagDetails.route)
+            },
+            onSearchTextChanged = {
+                if (it.isBlank())
+                    viewModel.handleIntent(TagListIntent.LoadTags)
+                else
+                    viewModel.handleIntent(TagListIntent.GetTagsByUser(it))
             }
-            navController.navigate(Screen.TagDetails.route)
-        }
+        )
     }
 
     when (viewState) {

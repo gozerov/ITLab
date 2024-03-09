@@ -13,7 +13,6 @@ import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
 
-
 class TagRemoteImpl @Inject constructor(
     private val tagApi: TagApi,
     @ApplicationContext private val context: Context
@@ -23,10 +22,24 @@ class TagRemoteImpl @Inject constructor(
         return tagApi.getTags().map { list -> list.map { tagResponse -> tagResponse.toTag() } }
     }
 
+    override suspend fun getTagsByUser(username: String): Result<List<Tag>> {
+        return tagApi.getTagsByUsername(username)
+            .map { list -> list.map { tagResponseBody -> tagResponseBody.toTag() } }
+    }
+
     override suspend fun getTagsAuthorized(accessToken: String): Result<List<Tag>> {
         val bearer = "Bearer $accessToken"
         return tagApi.getTagsAuthorized(bearer)
             .map { list -> list.map { tagResponse -> tagResponse.toTag() } }
+    }
+
+    override suspend fun getTagsByUserAuthorized(
+        accessToken: String,
+        username: String
+    ): Result<List<Tag>> {
+        val bearer = "Bearer $accessToken"
+        return tagApi.getTagsByUsernameAuthorized(bearer, username)
+            .map { list -> list.map { tagResponseBody -> tagResponseBody.toTag() } }
     }
 
     override suspend fun createTag(

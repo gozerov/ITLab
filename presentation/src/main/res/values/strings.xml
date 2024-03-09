@@ -22,4 +22,5 @@
     <string name="choose_file">Выбрать файл</string>
     <string name="remove">Удалить</string>
     <string name="subscribe_on_author">Подписаться на автора</string>
+    <string name="search">Поиск</string>
 </resources>

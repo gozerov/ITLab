@@ -9,11 +9,12 @@ import ru.gozerov.domain.models.tags.GetTagDetailsResult
 import ru.gozerov.domain.models.tags.GetTagsResult
 import ru.gozerov.domain.models.tags.LikeTagResult
 import ru.gozerov.domain.models.tags.Tag
-import ru.gozerov.domain.models.tags.TagDetails
 
 interface TagRepository : Repository {
 
     suspend fun getTags(): Flow<GetTagsResult>
+
+    suspend fun getTagsByUser(username: String): Flow<GetTagsResult>
 
     suspend fun getTagDetailsById(id: String): Flow<GetTagDetailsResult>
 

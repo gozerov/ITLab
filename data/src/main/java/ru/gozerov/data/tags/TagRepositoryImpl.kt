@@ -1,10 +1,8 @@
 package ru.gozerov.data.tags
 
-import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.gozerov.data.login.cache.UserStorage
 import ru.gozerov.data.tags.cache.TagStorage
@@ -43,8 +41,9 @@ class TagRepositoryImpl @Inject constructor(
             } else {
                 val response = tagRemote.getTags()
                 response
-                    .onSuccess {
-                        emit(GetTagsResult.Success(it))
+                    .onSuccess { tags ->
+                        emit(GetTagsResult.Success(tags))
+                        tagStorage.insertTags(tags)
                     }
                     .onFailure {
                         emit(GetTagsResult.Error)
@@ -52,6 +51,32 @@ class TagRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getTagsByUser(username: String): Flow<GetTagsResult> =
+        withContext(Dispatchers.IO) {
+            return@withContext flow<GetTagsResult> {
+                val token = userStorage.getCurrentAccessToken()
+                if (token != null) {
+                    val response = tagRemote.getTagsByUserAuthorized(token, username)
+                    response
+                        .onSuccess { tags ->
+                            emit(GetTagsResult.Success(tags))
+                        }
+                        .onFailure {
+                            emit(GetTagsResult.Error)
+                        }
+                } else {
+                    val response = tagRemote.getTagsByUser(username)
+                    response
+                        .onSuccess {
+                            emit(GetTagsResult.Success(it))
+                        }
+                        .onFailure {
+                            emit(GetTagsResult.Error)
+                        }
+                }
+            }
+        }
 
     override suspend fun getTagDetailsById(id: String): Flow<GetTagDetailsResult> =
         withContext(Dispatchers.IO) {

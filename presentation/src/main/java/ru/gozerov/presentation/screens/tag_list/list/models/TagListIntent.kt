@@ -4,4 +4,6 @@ sealed class TagListIntent {
 
     object LoadTags : TagListIntent()
 
+    class GetTagsByUser(val username: String) : TagListIntent()
+
 }
