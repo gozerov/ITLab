@@ -7,11 +7,17 @@ import kotlinx.coroutines.withContext
 import ru.gozerov.data.login.cache.UserStorage
 import ru.gozerov.data.tags.cache.TagStorage
 import ru.gozerov.data.tags.remote.TagRemote
+import ru.gozerov.data.utils.ApiConstants.defaultOptions
+import ru.gozerov.data.utils.ApiConstants.imageOptions
 import ru.gozerov.domain.models.tags.CreateTagData
 import ru.gozerov.domain.models.tags.CreateTagResult
 import ru.gozerov.domain.models.tags.DeleteLikeResult
 import ru.gozerov.domain.models.tags.DeleteTagResult
+import ru.gozerov.domain.models.tags.FilterOption
+import ru.gozerov.domain.models.tags.GetFilterOptionResult
+import ru.gozerov.domain.models.tags.GetTagByOptionData
 import ru.gozerov.domain.models.tags.GetTagDetailsResult
+import ru.gozerov.domain.models.tags.GetTagsByOptionResult
 import ru.gozerov.domain.models.tags.GetTagsResult
 import ru.gozerov.domain.models.tags.LikeTagResult
 import ru.gozerov.domain.models.tags.Tag
@@ -52,6 +58,41 @@ class TagRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getTagsByOption(getTagByOptionData: GetTagByOptionData): Flow<GetTagsByOptionResult> =
+        withContext(Dispatchers.IO) {
+            return@withContext flow<GetTagsByOptionResult> {
+                val token = userStorage.getCurrentAccessToken()
+                if (token != null) {
+                    val response = tagRemote.getTagsByOptionAuthorized(
+                        token,
+                        getTagByOptionData.defaultOption,
+                        getTagByOptionData.imageOption
+                    )
+                    response
+                        .onSuccess { tags ->
+                            emit(GetTagsByOptionResult.Success(tags))
+                            tagStorage.insertTags(tags)
+                        }
+                        .onFailure {
+                            emit(GetTagsByOptionResult.Error)
+                        }
+                } else {
+                    val response = tagRemote.getTagsByOption(
+                        getTagByOptionData.defaultOption,
+                        getTagByOptionData.imageOption
+                    )
+                    response
+                        .onSuccess { tags ->
+                            emit(GetTagsByOptionResult.Success(tags))
+                            tagStorage.insertTags(tags)
+                        }
+                        .onFailure {
+                            emit(GetTagsByOptionResult.Error)
+                        }
+                }
+            }
+        }
+
     override suspend fun getTagsByUser(username: String): Flow<GetTagsResult> =
         withContext(Dispatchers.IO) {
             return@withContext flow<GetTagsResult> {
@@ -84,6 +125,13 @@ class TagRepositoryImpl @Inject constructor(
                 val tag = tagStorage.getTagById(id)
                 val isLoggedUserAuthor = userStorage.isLoggedUserAuthor(tag)
                 emit(GetTagDetailsResult.Success(TagDetails(tag, isLoggedUserAuthor)))
+            }
+        }
+
+    override suspend fun getFilterOption(): Flow<GetFilterOptionResult> =
+        withContext(Dispatchers.IO) {
+            return@withContext flow {
+                emit(GetFilterOptionResult.Success(FilterOption(defaultOptions, imageOptions)))
             }
         }
 

@@ -25,4 +25,6 @@
     <string name="search">Поиск</string>
     <string name="filter">Фильтр</string>
     <string name="by_image">По картинке</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="reset_filters">Сбросить фильтры</string>
 </resources>

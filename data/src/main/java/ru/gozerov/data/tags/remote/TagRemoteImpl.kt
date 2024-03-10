@@ -7,6 +7,9 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import ru.gozerov.data.tags.remote.models.TagResponseBody
+import ru.gozerov.data.utils.ApiConstants.defaultOptions
+import ru.gozerov.data.utils.ApiConstants.imageOptions
 import ru.gozerov.data.utils.toTag
 import ru.gozerov.domain.models.tags.Tag
 import java.io.File
@@ -27,6 +30,20 @@ class TagRemoteImpl @Inject constructor(
             .map { list -> list.map { tagResponseBody -> tagResponseBody.toTag() } }
     }
 
+    override suspend fun getTagsByOption(
+        defaultOption: String,
+        imageOption: String
+    ): Result<List<Tag>> {
+        val isReversed = isTagListReversed(defaultOption)
+        val defaultFilter = getDefaultFilter(defaultOption)
+        val imageFilter = getImageFilter(imageOption)
+
+        return if (imageFilter == null)
+            tagApi.getTagsByOrderOption(defaultFilter).mapByDirection(isReversed)
+        else
+            tagApi.getTagsByOptions(defaultFilter, imageFilter).mapByDirection(isReversed)
+    }
+
     override suspend fun getTagsAuthorized(accessToken: String): Result<List<Tag>> {
         val bearer = "Bearer $accessToken"
         return tagApi.getTagsAuthorized(bearer)
@@ -40,6 +57,24 @@ class TagRemoteImpl @Inject constructor(
         val bearer = "Bearer $accessToken"
         return tagApi.getTagsByUsernameAuthorized(bearer, username)
             .map { list -> list.map { tagResponseBody -> tagResponseBody.toTag() } }
+    }
+
+    override suspend fun getTagsByOptionAuthorized(
+        accessToken: String,
+        defaultOption: String,
+        imageOption: String
+    ): Result<List<Tag>> {
+        val bearer = "Bearer $accessToken"
+        val isReversed = isTagListReversed(defaultOption)
+        val defaultFilter = getDefaultFilter(defaultOption)
+        val imageFilter = getImageFilter(imageOption)
+
+        return if (imageFilter == null)
+            tagApi.getTagsByOrderOptionAuthorized(bearer, defaultFilter)
+                .mapByDirection(isReversed)
+        else
+            tagApi.getTagsByOptionsAuthorized(bearer, defaultFilter, imageFilter)
+                .mapByDirection(isReversed)
     }
 
     override suspend fun createTag(
@@ -100,6 +135,44 @@ class TagRemoteImpl @Inject constructor(
             part = MultipartBody.Part.createFormData("image", file.name, requestBody)
         }
         return part
+    }
+
+    private fun getDefaultFilter(option: String): String {
+        return when (defaultOptions.indexOf(option)) {
+            0, 1 -> "user__username"
+            2, 3 -> "likes"
+            else -> throw IllegalArgumentException("Unknown filter")
+        }
+    }
+
+    private fun getImageFilter(option: String): String? {
+        return when (imageOptions.indexOf(option)) {
+            0 -> null
+            1 -> ""
+            else -> throw IllegalArgumentException("Unknown filter")
+        }
+    }
+
+    private fun isTagListReversed(defaultOption: String): Boolean {
+        return when (defaultOptions.indexOf(defaultOption)) {
+            0, 2 -> false
+            1, 3 -> true
+            else -> throw IllegalArgumentException("Unknown filter")
+        }
+    }
+
+    private fun Result<List<TagResponseBody>>.mapByDirection(
+        isReversed: Boolean,
+    ): Result<List<Tag>> {
+        return this.map { list ->
+            if (isReversed)
+                list
+                    .map { tagResponse -> tagResponse.toTag() }
+            else
+                list
+                    .map { tagResponse -> tagResponse.toTag() }
+                    .reversed()
+        }
     }
 
 }

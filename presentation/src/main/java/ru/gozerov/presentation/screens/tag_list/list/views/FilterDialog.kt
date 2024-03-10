@@ -1,5 +1,6 @@
 package ru.gozerov.presentation.screens.tag_list.list.views
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -9,17 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -31,18 +32,21 @@ import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @Composable
 fun FilterDialog(
-    onDismiss: () -> Unit
+    defaultOptions: List<String>,
+    imageOptions: List<String>,
+    selectedDefaultOption: MutableState<String>,
+    selectedImageOption: MutableState<String>,
+    onConfirm: (String, String) -> Unit,
+    onDismiss: () -> Unit,
+    onReset: () -> Unit
 ) {
-    val options = listOf(
-        "Алфавит авторов (от меньшего к большему)",
-        "Алфавит авторов (от большего к меньшему)",
-        "Количество лайков (от меньшего к большему)",
-        "Количество лайков (от большего к меньшему)"
-    )
-    var selectedOption by remember { mutableStateOf(options[0]) }
+    LaunchedEffect(key1 = null) {
+        if (selectedDefaultOption.value.isEmpty() && defaultOptions.isNotEmpty())
+            selectedDefaultOption.value = defaultOptions[0]
+        if (selectedImageOption.value.isEmpty() && imageOptions.isNotEmpty())
+            selectedImageOption.value = imageOptions[0]
+    }
 
-    val imageOptions = listOf("Все", "Только с картинкой")
-    var selectedImageOption by remember { mutableStateOf(imageOptions[0]) }
     Dialog(
         onDismissRequest = {
             onDismiss()
@@ -64,7 +68,7 @@ fun FilterDialog(
             Spacer(modifier = Modifier.height(12.dp))
 
             Column {
-                options.forEach { option ->
+                defaultOptions.forEach { option ->
                     Row(
                         Modifier
                             .fillMaxWidth()
@@ -73,14 +77,14 @@ fun FilterDialog(
                                 interactionSource = MutableInteractionSource(),
                                 indication = null
                             ) {
-                                selectedOption = option
+                                selectedDefaultOption.value = option
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = (option == selectedOption),
+                            selected = (option == selectedDefaultOption.value),
                             onClick = {
-                                selectedOption = option
+                                selectedDefaultOption.value = option
                             },
                             colors = RadioButtonDefaults.colors(
                                 selectedColor = ITLabTheme.colors.tintColor,
@@ -94,7 +98,7 @@ fun FilterDialog(
                         )
                     }
                 }
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier.padding(vertical = 8.dp),
                     color = ITLabTheme.colors.secondaryBackground
                 )
@@ -115,14 +119,14 @@ fun FilterDialog(
                                 interactionSource = MutableInteractionSource(),
                                 indication = null
                             ) {
-                                selectedImageOption = option
+                                selectedImageOption.value = option
                             },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = (option == selectedImageOption),
+                            selected = (option == selectedImageOption.value),
                             onClick = {
-                                selectedImageOption = option
+                                selectedImageOption.value = option
                             },
                             colors = RadioButtonDefaults.colors(
                                 selectedColor = ITLabTheme.colors.tintColor,
@@ -137,6 +141,37 @@ fun FilterDialog(
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .height(48.dp)
+                        .fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.tintColor),
+                    onClick = {
+                        onConfirm(selectedDefaultOption.value, selectedImageOption.value)
+                    }) {
+                    Text(
+                        text = stringResource(id = R.string.confirm),
+                        color = ITLabTheme.colors.primaryText
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .height(48.dp)
+                        .fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.primaryBackground),
+                    border = BorderStroke(2.dp, ITLabTheme.colors.secondaryBackground),
+                    onClick = {
+                        onReset()
+                    }) {
+                    Text(
+                        text = stringResource(id = R.string.reset_filters),
+                        color = ITLabTheme.colors.primaryText
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
         }

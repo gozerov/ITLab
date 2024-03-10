@@ -37,6 +37,12 @@ fun TagListView(
     tagList: List<Tag>,
     onTagClick: (tag: Tag) -> Unit,
     onSearchTextChanged: (text: String) -> Unit,
+    defaultOptions: List<String>,
+    imageOptions: List<String>,
+    selectedDefaultOption: MutableState<String>,
+    selectedImageOption: MutableState<String>,
+    onResetFilters: () -> Unit,
+    onConfirmFilters: (String, String) -> Unit
 ) {
     val searchState = remember { mutableStateOf("") }
     val isFilterDialogVisible = remember { mutableStateOf(false) }
@@ -84,9 +90,23 @@ fun TagListView(
             }
         }
         if (isFilterDialogVisible.value) {
-            FilterDialog {
-                isFilterDialogVisible.value = false
-            }
+            FilterDialog(
+                defaultOptions = defaultOptions,
+                imageOptions = imageOptions,
+                selectedDefaultOption = selectedDefaultOption,
+                selectedImageOption = selectedImageOption,
+                onConfirm = { defaultOption, imageOption ->
+                    isFilterDialogVisible.value = false
+                    onConfirmFilters(defaultOption, imageOption)
+                },
+                onDismiss = {
+                    isFilterDialogVisible.value = false
+                },
+                onReset = {
+                    isFilterDialogVisible.value = false
+                    onResetFilters()
+                }
+            )
         }
     }
 }

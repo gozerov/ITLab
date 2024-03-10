@@ -25,6 +25,17 @@ interface TagApi {
     ): Result<List<TagResponseBody>>
 
     @GET("api/tags/")
+    suspend fun getTagsByOptions(
+        @Query("order_by") defaultOption: String,
+        @Query("image__neq") imageOption: String
+    ): Result<List<TagResponseBody>>
+
+    @GET("api/tags/")
+    suspend fun getTagsByOrderOption(
+        @Query("order_by") defaultOption: String
+    ): Result<List<TagResponseBody>>
+
+    @GET("api/tags/")
     suspend fun getTagsAuthorized(
         @Header("Authorization") bearer: String
     ): Result<List<TagResponseBody>>
@@ -34,6 +45,19 @@ interface TagApi {
     suspend fun getTagsByUsernameAuthorized(
         @Header("Authorization") bearer: String,
         @Query("user__username") username: String
+    ): Result<List<TagResponseBody>>
+
+    @GET("api/tags/")
+    suspend fun getTagsByOptionsAuthorized(
+        @Header("Authorization") bearer: String,
+        @Query("order_by") defaultOption: String,
+        @Query("image__neq") imageOption: String
+    ): Result<List<TagResponseBody>>
+
+    @GET("api/tags/")
+    suspend fun getTagsByOrderOptionAuthorized(
+        @Header("Authorization") bearer: String,
+        @Query("order_by") defaultOption: String
     ): Result<List<TagResponseBody>>
 
     @Multipart

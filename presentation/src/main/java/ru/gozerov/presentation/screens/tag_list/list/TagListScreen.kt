@@ -28,12 +28,18 @@ fun TagListScreen(
     viewModel: TagListViewModel,
     paddingValues: PaddingValues
 ) {
+    val selectedDefaultOption = remember { mutableStateOf("") }
+    val selectedImageOption = remember { mutableStateOf("") }
+    val defaultOptions = remember { mutableStateOf<List<String>>(emptyList()) }
+    val imageOptions = remember { mutableStateOf<List<String>>(emptyList()) }
+
     SetupSystemBars()
     val tagState = remember { mutableStateOf<List<Tag>>(emptyList()) }
     val snackbarScopeState = remember { SnackbarHostState() }
     val viewState = viewModel.viewState.collectAsState().value
 
     LaunchedEffect(key1 = null) {
+        viewModel.handleIntent(TagListIntent.LoadFilters)
         viewModel.handleIntent(TagListIntent.LoadTags)
     }
 
@@ -59,6 +65,18 @@ fun TagListScreen(
                     viewModel.handleIntent(TagListIntent.LoadTags)
                 else
                     viewModel.handleIntent(TagListIntent.GetTagsByUser(it))
+            },
+            defaultOptions = defaultOptions.value,
+            imageOptions = imageOptions.value,
+            selectedDefaultOption = selectedDefaultOption,
+            selectedImageOption = selectedImageOption,
+            onConfirmFilters = { defaultOption, imageOption ->
+                viewModel.handleIntent(TagListIntent.LoadTagsByFilters(defaultOption, imageOption))
+            },
+            onResetFilters = {
+                selectedDefaultOption.value = ""
+                selectedImageOption.value = ""
+                viewModel.handleIntent(TagListIntent.LoadTags)
             }
         )
     }
@@ -67,6 +85,11 @@ fun TagListScreen(
         is TagListViewState.None -> {}
         is TagListViewState.TagList -> {
             tagState.value = viewState.tags
+        }
+
+        is TagListViewState.Filters -> {
+            defaultOptions.value = viewState.defaultFilters
+            imageOptions.value = viewState.imageFilters
         }
 
         is TagListViewState.Error -> {

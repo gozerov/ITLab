@@ -10,6 +10,11 @@ sealed class TagListViewState {
         val tags: List<Tag>
     ): TagListViewState()
 
+    class Filters(
+        val defaultFilters: List<String>,
+        val imageFilters: List<String>
+    ): TagListViewState()
+
     class Error: TagListViewState()
 
 }
