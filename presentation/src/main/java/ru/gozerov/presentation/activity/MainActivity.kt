@@ -29,7 +29,9 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Scaffold {
+                    Scaffold(
+                        containerColor = ITLabTheme.colors.primaryBackground
+                    ) {
                         NavHostContainer(navController = navController, padding = it)
                     }
                 }

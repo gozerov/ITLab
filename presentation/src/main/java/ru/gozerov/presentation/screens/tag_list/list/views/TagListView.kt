@@ -36,6 +36,7 @@ import ru.gozerov.presentation.ui.theme.ITLabTheme
 fun TagListView(
     tagList: List<Tag>,
     onTagClick: (tag: Tag) -> Unit,
+    searchFieldState: MutableState<String>,
     onSearchTextChanged: (text: String) -> Unit,
     defaultOptions: List<String>,
     imageOptions: List<String>,
@@ -44,7 +45,6 @@ fun TagListView(
     onResetFilters: () -> Unit,
     onConfirmFilters: (String, String) -> Unit
 ) {
-    val searchState = remember { mutableStateOf("") }
     val isFilterDialogVisible = remember { mutableStateOf(false) }
     Scaffold(
         modifier = Modifier
@@ -62,7 +62,7 @@ fun TagListView(
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .weight(1f),
-                    textState = searchState,
+                    textState = searchFieldState,
                     hintStringRes = R.string.search,
                     onSearchTextChanged = onSearchTextChanged
                 )

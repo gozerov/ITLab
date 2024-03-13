@@ -2,6 +2,8 @@ package ru.gozerov.presentation.screens.tag_map.views
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,6 +74,11 @@ fun TagMapView(
         LocationServices.getFusedLocationProviderClient(context)
 
     val tagBottomSheetState = rememberModalBottomSheetState()
+    val isDarkMode = isSystemInDarkTheme()
+
+    LaunchedEffect(key1 = null) {
+        mapViewState.value?.mapWindow?.map?.isNightModeEnabled = isDarkMode
+    }
 
     tagList.forEach { tag ->
         mapViewState.value?.mapWindow?.map?.mapObjects?.addPlacemark {
@@ -95,12 +103,11 @@ fun TagMapView(
         override fun onMapLongTap(p0: Map, p1: Point) {}
     }
 
-
     if (isSetupSystemBarsNeeded.value)
-        SetupSystemBars(Color.Transparent, true)
+        SetupSystemBars(Color.Transparent)
 
     SetupMap(moveCameraToUserState, mapViewState, fusedLocationClient, inputListener)
-    SetupSystemBars(Color.Transparent, true)
+    SetupSystemBars(Color.Transparent)
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -129,10 +136,13 @@ fun TagMapView(
                         .padding(end = 8.dp)
                         .clip(RoundedCornerShape(100))
                         .alpha(0.9f)
-                        .background(ITLabTheme.colors.primaryBackground)
+                        .background(ITLabTheme.colors.primaryBackground),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+
                 ) {
                     DefaultMapButton(
-                        modifier = Modifier,
+                        modifier = Modifier.padding(bottom = 4.dp),
                         iconId = R.drawable.ic_add_24
                     ) {
                         mapViewState.value?.run {
@@ -144,7 +154,7 @@ fun TagMapView(
                     }
 
                     DefaultMapButton(
-                        modifier = Modifier.padding(top = 4.dp, bottom = 4.dp),
+                        modifier = Modifier.padding(top = 4.dp),
                         iconId = R.drawable.ic_remove_24
                     ) {
                         mapViewState.value?.run {

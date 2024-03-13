@@ -1,6 +1,6 @@
 package ru.gozerov.domain.models.tags
 
-data class GetTagByOptionData(
+data class GetTagsByOptionData(
     val defaultOption: String,
     val imageOption: String
 )

@@ -9,6 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.screens.account.AccountScreen
+import ru.gozerov.presentation.screens.shared.enterAnimation
+import ru.gozerov.presentation.screens.shared.exitAnimation
 import ru.gozerov.presentation.screens.tag_list.details.TagDetailsScreen
 import ru.gozerov.presentation.screens.tag_list.details.TagDetailsViewModel
 import ru.gozerov.presentation.screens.tag_list.list.TagListScreen
@@ -25,18 +27,28 @@ fun BottomNavHostContainer(
         navController = navController,
         startDestination = BottomNavBarItem.TagMap.route,
         builder = {
-            composable(BottomNavBarItem.TagMap.route) {
+            composable(
+                route = BottomNavBarItem.TagMap.route,
+                enterTransition = { enterAnimation() },
+                exitTransition = { exitAnimation() }
+            ) {
                 val tagMapViewModel = hiltViewModel<TagMapViewModel>()
                 TagMapScreen(tagMapViewModel)
             }
             navigation(Screen.TagList.route, BottomNavBarItem.TagListFlow.route) {
-                composable(Screen.TagList.route) {
+                composable(
+                    route = Screen.TagList.route,
+                    enterTransition = { enterAnimation() },
+                    exitTransition = { exitAnimation() }
+                ) {
                     val tagListViewModel = hiltViewModel<TagListViewModel>()
                     TagListScreen(navController, tagListViewModel, padding)
                 }
                 composable(
                     route = Screen.TagDetails.route,
-                ) { backStackEntry ->
+                    enterTransition = { enterAnimation() },
+                    exitTransition = { exitAnimation() }
+                ) { _ ->
                     val tagDetailsViewModel = hiltViewModel<TagDetailsViewModel>()
                     val tag =
                         navController.previousBackStackEntry?.savedStateHandle?.get<Tag>("tag")
@@ -48,11 +60,12 @@ fun BottomNavHostContainer(
                             tag = tag
                         )
                     }
-
                 }
             }
-
-            composable(BottomNavBarItem.Account.route) {
+            composable(
+                route = BottomNavBarItem.Account.route,
+                enterTransition = { enterAnimation() },
+                exitTransition = { exitAnimation() }) {
                 AccountScreen()
             }
         }

@@ -9,23 +9,21 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.gozerov.domain.models.tags.GetFilterOptionResult
-import ru.gozerov.domain.models.tags.GetTagByOptionData
-import ru.gozerov.domain.models.tags.GetTagsByOptionResult
+import ru.gozerov.domain.models.tags.GetTagsByOptionAndUserData
+import ru.gozerov.domain.models.tags.GetTagsByOptionData
 import ru.gozerov.domain.models.tags.GetTagsResult
 import ru.gozerov.domain.usecases.tags.GetFilterOptions
-import ru.gozerov.domain.usecases.tags.GetTags
 import ru.gozerov.domain.usecases.tags.GetTagsByOption
-import ru.gozerov.domain.usecases.tags.GetTagsByUser
+import ru.gozerov.domain.usecases.tags.GetTagsByOptionAndUser
 import ru.gozerov.presentation.screens.tag_list.list.models.TagListIntent
 import ru.gozerov.presentation.screens.tag_list.list.models.TagListViewState
 import javax.inject.Inject
 
 @HiltViewModel
 class TagListViewModel @Inject constructor(
-    private val getTags: GetTags,
-    private val getTagsByUser: GetTagsByUser,
     private val getTagsByOption: GetTagsByOption,
-    private val getFilterOptions: GetFilterOptions
+    private val getFilterOptions: GetFilterOptions,
+    private val getTagsByOptionAndUser: GetTagsByOptionAndUser
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<TagListViewState>(TagListViewState.None)
@@ -34,37 +32,32 @@ class TagListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            observeGetTagsResult()
-            observeGetTagsByUserResult()
             observeGetFilterOptionsResult()
             observeGetTagsByOptionResult()
+            observeGetTagsByOptionAndUserResult()
         }
     }
 
     fun handleIntent(intent: TagListIntent) {
         viewModelScope.launch {
             when (intent) {
-                is TagListIntent.LoadTags -> getTags.execute(Unit)
-                is TagListIntent.GetTagsByUser -> getTagsByUser.execute(intent.username)
                 is TagListIntent.LoadFilters -> getFilterOptions.execute(Unit)
                 is TagListIntent.LoadTagsByFilters ->
                     getTagsByOption.execute(
-                        GetTagByOptionData(
+                        GetTagsByOptionData(
                             intent.defaultOption,
                             intent.imageOption
                         )
                     )
-            }
-        }
-    }
 
-    private fun CoroutineScope.observeGetTagsResult() {
-        launch {
-            getTags.result.collect { result ->
-                when (result) {
-                    is GetTagsResult.Success -> _viewState.emit(TagListViewState.TagList(result.tags))
-                    is GetTagsResult.Error -> _viewState.emit(TagListViewState.Error())
-                }
+                is TagListIntent.LoadTagsByFiltersAndUser ->
+                    getTagsByOptionAndUser.execute(
+                        GetTagsByOptionAndUserData(
+                            intent.username,
+                            intent.defaultOption,
+                            intent.imageOption
+                        )
+                    )
             }
         }
     }
@@ -90,23 +83,28 @@ class TagListViewModel @Inject constructor(
         launch {
             getTagsByOption.result.collect { result ->
                 when (result) {
-                    is GetTagsByOptionResult.Success -> _viewState.emit(
+                    is GetTagsResult.Success -> _viewState.emit(
                         TagListViewState.TagList(
                             result.tags
                         )
                     )
 
-                    is GetTagsByOptionResult.Error -> _viewState.emit(TagListViewState.Error())
+                    is GetTagsResult.Error -> _viewState.emit(TagListViewState.Error())
                 }
             }
         }
     }
 
-    private fun CoroutineScope.observeGetTagsByUserResult() {
+    private fun CoroutineScope.observeGetTagsByOptionAndUserResult() {
         launch {
-            getTagsByUser.result.collect { result ->
+            getTagsByOptionAndUser.result.collect { result ->
                 when (result) {
-                    is GetTagsResult.Success -> _viewState.emit(TagListViewState.TagList(result.tags))
+                    is GetTagsResult.Success -> _viewState.emit(
+                        TagListViewState.TagList(
+                            result.tags
+                        )
+                    )
+
                     is GetTagsResult.Error -> _viewState.emit(TagListViewState.Error())
                 }
             }

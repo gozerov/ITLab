@@ -11,7 +11,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
@@ -25,7 +24,7 @@ import ru.gozerov.presentation.screens.tag_map.views.TagMapView
 fun TagMapScreen(
     viewModel: TagMapViewModel
 ) {
-    SetupSystemBars(statusBarColor = Color.Transparent)
+    SetupSystemBars()
     val snackbarScopeState = remember { SnackbarHostState() }
 
     val viewState = viewModel.viewState.collectAsState().value

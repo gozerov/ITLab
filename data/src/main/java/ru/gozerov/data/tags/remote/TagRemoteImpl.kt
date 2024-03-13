@@ -25,11 +25,6 @@ class TagRemoteImpl @Inject constructor(
         return tagApi.getTags().map { list -> list.map { tagResponse -> tagResponse.toTag() } }
     }
 
-    override suspend fun getTagsByUser(username: String): Result<List<Tag>> {
-        return tagApi.getTagsByUsername(username)
-            .map { list -> list.map { tagResponseBody -> tagResponseBody.toTag() } }
-    }
-
     override suspend fun getTagsByOption(
         defaultOption: String,
         imageOption: String
@@ -39,24 +34,30 @@ class TagRemoteImpl @Inject constructor(
         val imageFilter = getImageFilter(imageOption)
 
         return if (imageFilter == null)
-            tagApi.getTagsByOrderOption(defaultFilter).mapByDirection(isReversed)
+            tagApi.getTagsByOrder(defaultFilter).mapByDirection(isReversed)
         else
             tagApi.getTagsByOptions(defaultFilter, imageFilter).mapByDirection(isReversed)
+    }
+
+    override suspend fun getTagsByOptionAndUser(
+        username: String,
+        defaultOption: String,
+        imageOption: String
+    ): Result<List<Tag>> {
+        val isReversed = isTagListReversed(defaultOption)
+        val defaultFilter = getDefaultFilter(defaultOption)
+        val imageFilter = getImageFilter(imageOption)
+
+        return if (imageFilter == null)
+            tagApi.getTagsByOrderAndUsername(username, defaultFilter).mapByDirection(isReversed)
+        else
+            tagApi.getTagsByOptionsAndUsername(username, defaultFilter, imageFilter).mapByDirection(isReversed)
     }
 
     override suspend fun getTagsAuthorized(accessToken: String): Result<List<Tag>> {
         val bearer = "Bearer $accessToken"
         return tagApi.getTagsAuthorized(bearer)
             .map { list -> list.map { tagResponse -> tagResponse.toTag() } }
-    }
-
-    override suspend fun getTagsByUserAuthorized(
-        accessToken: String,
-        username: String
-    ): Result<List<Tag>> {
-        val bearer = "Bearer $accessToken"
-        return tagApi.getTagsByUsernameAuthorized(bearer, username)
-            .map { list -> list.map { tagResponseBody -> tagResponseBody.toTag() } }
     }
 
     override suspend fun getTagsByOptionAuthorized(
@@ -70,10 +71,29 @@ class TagRemoteImpl @Inject constructor(
         val imageFilter = getImageFilter(imageOption)
 
         return if (imageFilter == null)
-            tagApi.getTagsByOrderOptionAuthorized(bearer, defaultFilter)
+            tagApi.getTagsByOrderAuthorized(bearer, defaultFilter)
                 .mapByDirection(isReversed)
         else
             tagApi.getTagsByOptionsAuthorized(bearer, defaultFilter, imageFilter)
+                .mapByDirection(isReversed)
+    }
+
+    override suspend fun getTagsByOptionAndUserAuthorized(
+        accessToken: String,
+        username: String,
+        defaultOption: String,
+        imageOption: String
+    ): Result<List<Tag>> {
+        val bearer = "Bearer $accessToken"
+        val isReversed = isTagListReversed(defaultOption)
+        val defaultFilter = getDefaultFilter(defaultOption)
+        val imageFilter = getImageFilter(imageOption)
+
+        return if (imageFilter == null)
+            tagApi.getTagsByOrderAndUsernameAuthorized(bearer, username, defaultFilter)
+                .mapByDirection(isReversed)
+        else
+            tagApi.getTagsByOptionsAndUsernameAuthorized(bearer, username, defaultFilter, imageFilter)
                 .mapByDirection(isReversed)
     }
 
@@ -155,8 +175,8 @@ class TagRemoteImpl @Inject constructor(
 
     private fun isTagListReversed(defaultOption: String): Boolean {
         return when (defaultOptions.indexOf(defaultOption)) {
-            0, 2 -> false
-            1, 3 -> true
+            1, 3 -> false
+            0, 2 -> true
             else -> throw IllegalArgumentException("Unknown filter")
         }
     }

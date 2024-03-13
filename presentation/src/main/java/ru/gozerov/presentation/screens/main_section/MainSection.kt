@@ -16,7 +16,7 @@ fun MainSection(rootNavController: NavHostController, contentPaddingValues: Padd
         bottomBar = {
             BottomNavigationBar(navController = navController, contentPaddingValues)
         },
-        contentColor = ITLabTheme.colors.controlColor
+        containerColor = ITLabTheme.colors.primaryBackground
     ) { contentPadding ->
         BottomNavHostContainer(navController = navController, padding = contentPadding)
     }

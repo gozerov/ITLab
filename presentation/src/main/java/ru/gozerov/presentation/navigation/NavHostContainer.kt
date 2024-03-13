@@ -11,6 +11,8 @@ import ru.gozerov.presentation.screens.choose_account.ChooseAccountViewModel
 import ru.gozerov.presentation.screens.login.LoginScreen
 import ru.gozerov.presentation.screens.login.LoginViewModel
 import ru.gozerov.presentation.screens.main_section.MainSection
+import ru.gozerov.presentation.screens.shared.enterAnimation
+import ru.gozerov.presentation.screens.shared.exitAnimation
 
 @Composable
 fun NavHostContainer(
@@ -21,21 +23,33 @@ fun NavHostContainer(
         navController = navController,
         startDestination = Screen.ChooseAccount.route,
         builder = {
-            composable(Screen.ChooseAccount.route) {
+            composable(
+                route = Screen.ChooseAccount.route,
+                enterTransition = { enterAnimation() },
+                exitTransition = { exitAnimation() }
+            ) {
                 val chooseAccountViewModel = hiltViewModel<ChooseAccountViewModel>()
                 ChooseAccountScreen(
                     navController = navController,
                     viewModel = chooseAccountViewModel
                 )
             }
-            composable(Screen.Login.route) {
+            composable(
+                route = Screen.Login.route,
+                enterTransition = { enterAnimation() },
+                exitTransition = { exitAnimation() }
+            ) {
                 val loginViewModel = hiltViewModel<LoginViewModel>()
                 LoginScreen(
                     navController = navController,
                     viewModel = loginViewModel
                 )
             }
-            composable(Screen.MainSection.route) {
+            composable(
+                route = Screen.MainSection.route,
+                enterTransition = { enterAnimation() },
+                exitTransition = { exitAnimation() }
+            ) {
                 MainSection(rootNavController = navController, padding)
             }
         }

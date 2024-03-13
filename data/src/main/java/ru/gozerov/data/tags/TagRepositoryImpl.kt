@@ -15,9 +15,9 @@ import ru.gozerov.domain.models.tags.DeleteLikeResult
 import ru.gozerov.domain.models.tags.DeleteTagResult
 import ru.gozerov.domain.models.tags.FilterOption
 import ru.gozerov.domain.models.tags.GetFilterOptionResult
-import ru.gozerov.domain.models.tags.GetTagByOptionData
 import ru.gozerov.domain.models.tags.GetTagDetailsResult
-import ru.gozerov.domain.models.tags.GetTagsByOptionResult
+import ru.gozerov.domain.models.tags.GetTagsByOptionAndUserData
+import ru.gozerov.domain.models.tags.GetTagsByOptionData
 import ru.gozerov.domain.models.tags.GetTagsResult
 import ru.gozerov.domain.models.tags.LikeTagResult
 import ru.gozerov.domain.models.tags.Tag
@@ -58,59 +58,70 @@ class TagRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getTagsByOption(getTagByOptionData: GetTagByOptionData): Flow<GetTagsByOptionResult> =
-        withContext(Dispatchers.IO) {
-            return@withContext flow<GetTagsByOptionResult> {
-                val token = userStorage.getCurrentAccessToken()
-                if (token != null) {
-                    val response = tagRemote.getTagsByOptionAuthorized(
-                        token,
-                        getTagByOptionData.defaultOption,
-                        getTagByOptionData.imageOption
-                    )
-                    response
-                        .onSuccess { tags ->
-                            emit(GetTagsByOptionResult.Success(tags))
-                            tagStorage.insertTags(tags)
-                        }
-                        .onFailure {
-                            emit(GetTagsByOptionResult.Error)
-                        }
-                } else {
-                    val response = tagRemote.getTagsByOption(
-                        getTagByOptionData.defaultOption,
-                        getTagByOptionData.imageOption
-                    )
-                    response
-                        .onSuccess { tags ->
-                            emit(GetTagsByOptionResult.Success(tags))
-                            tagStorage.insertTags(tags)
-                        }
-                        .onFailure {
-                            emit(GetTagsByOptionResult.Error)
-                        }
-                }
-            }
-        }
-
-    override suspend fun getTagsByUser(username: String): Flow<GetTagsResult> =
+    override suspend fun getTagsByOption(getTagsByOptionData: GetTagsByOptionData): Flow<GetTagsResult> =
         withContext(Dispatchers.IO) {
             return@withContext flow<GetTagsResult> {
                 val token = userStorage.getCurrentAccessToken()
                 if (token != null) {
-                    val response = tagRemote.getTagsByUserAuthorized(token, username)
+                    val response = tagRemote.getTagsByOptionAuthorized(
+                        token,
+                        getTagsByOptionData.defaultOption,
+                        getTagsByOptionData.imageOption
+                    )
                     response
                         .onSuccess { tags ->
                             emit(GetTagsResult.Success(tags))
+                            tagStorage.insertTags(tags)
                         }
                         .onFailure {
                             emit(GetTagsResult.Error)
                         }
                 } else {
-                    val response = tagRemote.getTagsByUser(username)
+                    val response = tagRemote.getTagsByOption(
+                        getTagsByOptionData.defaultOption,
+                        getTagsByOptionData.imageOption
+                    )
                     response
-                        .onSuccess {
-                            emit(GetTagsResult.Success(it))
+                        .onSuccess { tags ->
+                            emit(GetTagsResult.Success(tags))
+                            tagStorage.insertTags(tags)
+                        }
+                        .onFailure {
+                            emit(GetTagsResult.Error)
+                        }
+                }
+            }
+        }
+
+    override suspend fun getTagsByOptionAndUser(getTagsByOptionAndUserData: GetTagsByOptionAndUserData): Flow<GetTagsResult> =
+        withContext(Dispatchers.IO) {
+            return@withContext flow<GetTagsResult> {
+                val token = userStorage.getCurrentAccessToken()
+                if (token != null) {
+                    val response = tagRemote.getTagsByOptionAndUserAuthorized(
+                        token,
+                        getTagsByOptionAndUserData.username,
+                        getTagsByOptionAndUserData.defaultOption,
+                        getTagsByOptionAndUserData.imageOption
+                    )
+                    response
+                        .onSuccess { tags ->
+                            emit(GetTagsResult.Success(tags))
+                            tagStorage.insertTags(tags)
+                        }
+                        .onFailure {
+                            emit(GetTagsResult.Error)
+                        }
+                } else {
+                    val response = tagRemote.getTagsByOptionAndUser(
+                        getTagsByOptionAndUserData.username,
+                        getTagsByOptionAndUserData.defaultOption,
+                        getTagsByOptionAndUserData.imageOption
+                    )
+                    response
+                        .onSuccess { tags ->
+                            emit(GetTagsResult.Success(tags))
+                            tagStorage.insertTags(tags)
                         }
                         .onFailure {
                             emit(GetTagsResult.Error)

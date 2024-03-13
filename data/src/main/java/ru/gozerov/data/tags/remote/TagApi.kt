@@ -20,31 +20,32 @@ interface TagApi {
     suspend fun getTags(): Result<List<TagResponseBody>>
 
     @GET("api/tags/")
-    suspend fun getTagsByUsername(
-        @Query("user__username") username: String
-    ): Result<List<TagResponseBody>>
-
-    @GET("api/tags/")
     suspend fun getTagsByOptions(
         @Query("order_by") defaultOption: String,
         @Query("image__neq") imageOption: String
     ): Result<List<TagResponseBody>>
 
     @GET("api/tags/")
-    suspend fun getTagsByOrderOption(
+    suspend fun getTagsByOrder(
+        @Query("order_by") defaultOption: String
+    ): Result<List<TagResponseBody>>
+
+    @GET("api/tags/")
+    suspend fun getTagsByOptionsAndUsername(
+        @Query("user__username") username: String,
+        @Query("order_by") defaultOption: String,
+        @Query("image__neq") imageOption: String
+    ): Result<List<TagResponseBody>>
+
+    @GET("api/tags/")
+    suspend fun getTagsByOrderAndUsername(
+        @Query("user__username") username: String,
         @Query("order_by") defaultOption: String
     ): Result<List<TagResponseBody>>
 
     @GET("api/tags/")
     suspend fun getTagsAuthorized(
         @Header("Authorization") bearer: String
-    ): Result<List<TagResponseBody>>
-
-
-    @GET("api/tags/")
-    suspend fun getTagsByUsernameAuthorized(
-        @Header("Authorization") bearer: String,
-        @Query("user__username") username: String
     ): Result<List<TagResponseBody>>
 
     @GET("api/tags/")
@@ -55,8 +56,23 @@ interface TagApi {
     ): Result<List<TagResponseBody>>
 
     @GET("api/tags/")
-    suspend fun getTagsByOrderOptionAuthorized(
+    suspend fun getTagsByOrderAuthorized(
         @Header("Authorization") bearer: String,
+        @Query("order_by") defaultOption: String
+    ): Result<List<TagResponseBody>>
+
+    @GET("api/tags/")
+    suspend fun getTagsByOptionsAndUsernameAuthorized(
+        @Header("Authorization") bearer: String,
+        @Query("user__username") username: String,
+        @Query("order_by") defaultOption: String,
+        @Query("image__neq") imageOption: String
+    ): Result<List<TagResponseBody>>
+
+    @GET("api/tags/")
+    suspend fun getTagsByOrderAndUsernameAuthorized(
+        @Header("Authorization") bearer: String,
+        @Query("user__username") username: String,
         @Query("order_by") defaultOption: String
     ): Result<List<TagResponseBody>>
 

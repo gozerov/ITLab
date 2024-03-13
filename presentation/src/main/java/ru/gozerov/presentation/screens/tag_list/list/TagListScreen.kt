@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import ru.gozerov.domain.models.tags.Tag
@@ -20,6 +21,7 @@ import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.screens.tag_list.list.models.TagListIntent
 import ru.gozerov.presentation.screens.tag_list.list.models.TagListViewState
 import ru.gozerov.presentation.screens.tag_list.list.views.TagListView
+import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -28,10 +30,12 @@ fun TagListScreen(
     viewModel: TagListViewModel,
     paddingValues: PaddingValues
 ) {
-    val selectedDefaultOption = remember { mutableStateOf("") }
-    val selectedImageOption = remember { mutableStateOf("") }
+    val selectedDefaultOption =
+        rememberSaveable { mutableStateOf("Алфавит авторов (от меньшего к большему)") }
+    val selectedImageOption = rememberSaveable { mutableStateOf("Все") }
     val defaultOptions = remember { mutableStateOf<List<String>>(emptyList()) }
     val imageOptions = remember { mutableStateOf<List<String>>(emptyList()) }
+    val searchFieldState = rememberSaveable { mutableStateOf("") }
 
     SetupSystemBars()
     val tagState = remember { mutableStateOf<List<Tag>>(emptyList()) }
@@ -40,13 +44,30 @@ fun TagListScreen(
 
     LaunchedEffect(key1 = null) {
         viewModel.handleIntent(TagListIntent.LoadFilters)
-        viewModel.handleIntent(TagListIntent.LoadTags)
+
+        if (searchFieldState.value.isBlank()) {
+            viewModel.handleIntent(
+                TagListIntent.LoadTagsByFilters(
+                    selectedDefaultOption.value,
+                    selectedImageOption.value
+                )
+            )
+        } else {
+            viewModel.handleIntent(
+                TagListIntent.LoadTagsByFiltersAndUser(
+                    username = searchFieldState.value,
+                    selectedDefaultOption.value,
+                    selectedImageOption.value
+                )
+            )
+        }
     }
 
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues),
+        containerColor = ITLabTheme.colors.primaryBackground,
         snackbarHost = {
             SnackbarHost(snackbarScopeState)
         }
@@ -60,23 +81,67 @@ fun TagListScreen(
                 }
                 navController.navigate(Screen.TagDetails.route)
             },
+            searchFieldState = searchFieldState,
             onSearchTextChanged = {
-                if (it.isBlank())
-                    viewModel.handleIntent(TagListIntent.LoadTags)
-                else
-                    viewModel.handleIntent(TagListIntent.GetTagsByUser(it))
+                if (it.isBlank()) {
+                    viewModel.handleIntent(
+                        TagListIntent.LoadTagsByFilters(
+                            selectedDefaultOption.value,
+                            selectedImageOption.value
+                        )
+                    )
+                } else {
+                    viewModel.handleIntent(
+                        TagListIntent.LoadTagsByFiltersAndUser(
+                            username = it,
+                            selectedDefaultOption.value,
+                            selectedImageOption.value
+                        )
+                    )
+
+                }
             },
             defaultOptions = defaultOptions.value,
             imageOptions = imageOptions.value,
             selectedDefaultOption = selectedDefaultOption,
             selectedImageOption = selectedImageOption,
             onConfirmFilters = { defaultOption, imageOption ->
-                viewModel.handleIntent(TagListIntent.LoadTagsByFilters(defaultOption, imageOption))
+                if (searchFieldState.value.isBlank()) {
+                    viewModel.handleIntent(
+                        TagListIntent.LoadTagsByFilters(
+                            selectedDefaultOption.value,
+                            selectedImageOption.value
+                        )
+                    )
+                } else {
+                    viewModel.handleIntent(
+                        TagListIntent.LoadTagsByFiltersAndUser(
+                            username = searchFieldState.value,
+                            selectedDefaultOption.value,
+                            selectedImageOption.value
+                        )
+                    )
+                }
             },
             onResetFilters = {
-                selectedDefaultOption.value = ""
-                selectedImageOption.value = ""
-                viewModel.handleIntent(TagListIntent.LoadTags)
+                selectedDefaultOption.value = "Алфавит авторов (от меньшего к большему)"
+                selectedImageOption.value = "Все"
+                if (searchFieldState.value.isBlank()) {
+                    viewModel.handleIntent(
+                        TagListIntent.LoadTagsByFilters(
+                            selectedDefaultOption.value,
+                            selectedImageOption.value
+                        )
+                    )
+                } else {
+                    viewModel.handleIntent(
+                        TagListIntent.LoadTagsByFiltersAndUser(
+                            username = searchFieldState.value,
+                            selectedDefaultOption.value,
+                            selectedImageOption.value
+                        )
+                    )
+                }
             }
         )
     }

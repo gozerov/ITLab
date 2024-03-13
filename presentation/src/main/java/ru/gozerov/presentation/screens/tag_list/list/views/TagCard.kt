@@ -2,6 +2,7 @@ package ru.gozerov.presentation.screens.tag_list.list.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -86,6 +87,23 @@ fun TagCard(tag: Tag, onTagClick: (tag: Tag) -> Unit) {
                 color = ITLabTheme.colors.primaryText,
                 maxLines = 1
             )
+        }
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Text(
+                text = tag.likes.toString(),
+                color = ITLabTheme.colors.primaryText
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.ic_like_full_24),
+                contentDescription = null,
+                tint = ITLabTheme.colors.errorColor
+            )
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 }
