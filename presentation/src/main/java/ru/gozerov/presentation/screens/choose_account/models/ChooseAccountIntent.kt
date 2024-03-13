@@ -8,6 +8,8 @@ sealed class ChooseAccountIntent {
 
     class Login(val user: User) : ChooseAccountIntent()
 
+    class LoginAsGuest : ChooseAccountIntent()
+
     class DeleteAccount(val user: User) : ChooseAccountIntent()
 
     object ExitScreen : ChooseAccountIntent()

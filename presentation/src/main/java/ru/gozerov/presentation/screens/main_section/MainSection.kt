@@ -18,6 +18,9 @@ fun MainSection(rootNavController: NavHostController, contentPaddingValues: Padd
         },
         containerColor = ITLabTheme.colors.primaryBackground
     ) { contentPadding ->
-        BottomNavHostContainer(navController = navController, padding = contentPadding)
+        BottomNavHostContainer(
+            navController = navController,
+            rootNavController = rootNavController,
+            padding = contentPadding)
     }
 }

@@ -27,4 +27,6 @@
     <string name="by_image">По картинке</string>
     <string name="confirm">Подтвердить</string>
     <string name="reset_filters">Сбросить фильтры</string>
+    <string name="guest">Гость</string>
+    <string name="guest_mode">Гостевой режим</string>
 </resources>

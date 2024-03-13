@@ -1,6 +1,5 @@
 package ru.gozerov.presentation.screens.choose_account
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,9 +10,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.gozerov.domain.models.login.DeleteUserResult
 import ru.gozerov.domain.models.login.GetUsersResult
+import ru.gozerov.domain.models.login.GuestModeResult
 import ru.gozerov.domain.models.login.LoginWithoutPasswordResult
 import ru.gozerov.domain.usecases.login.DeleteUser
 import ru.gozerov.domain.usecases.login.GetUsers
+import ru.gozerov.domain.usecases.login.GuestMode
 import ru.gozerov.domain.usecases.login.LoginWithoutPassword
 import ru.gozerov.presentation.screens.choose_account.models.ChooseAccountIntent
 import ru.gozerov.presentation.screens.choose_account.models.ChooseAccountViewState
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class ChooseAccountViewModel @Inject constructor(
     private val getUsers: GetUsers,
     private val loginWithoutPassword: LoginWithoutPassword,
+    private val guestMode: GuestMode,
     private val deleteUser: DeleteUser
 ) : ViewModel() {
 
@@ -35,6 +37,7 @@ class ChooseAccountViewModel @Inject constructor(
             observeGetUsersResult()
             observeLoginWithoutPasswordResult()
             observeDeleteUserResult()
+            observeGuestModeResult()
         }
     }
 
@@ -88,6 +91,20 @@ class ChooseAccountViewModel @Inject constructor(
         }
     }
 
+    private fun CoroutineScope.observeGuestModeResult() {
+        launch {
+            guestMode.result.collect { result ->
+                when (result) {
+                    is GuestModeResult.Success -> {
+                        _viewState.emit(ChooseAccountViewState.SuccessLogin())
+                    }
+
+                    is GuestModeResult.Error -> {}
+                }
+            }
+        }
+    }
+
     fun handleIntent(intent: ChooseAccountIntent) {
         viewModelScope.launch {
             when (intent) {
@@ -97,6 +114,10 @@ class ChooseAccountViewModel @Inject constructor(
 
                 is ChooseAccountIntent.Login -> {
                     loginWithoutPassword.execute(intent.user.username)
+                }
+
+                is ChooseAccountIntent.LoginAsGuest -> {
+                    guestMode.execute(Unit)
                 }
 
                 is ChooseAccountIntent.DeleteAccount -> {

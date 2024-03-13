@@ -10,7 +10,11 @@ import ru.gozerov.data.login.cache.UserStorage
 import ru.gozerov.data.login.remote.LoginRemote
 import ru.gozerov.data.utils.ApiConstants
 import ru.gozerov.domain.models.login.DeleteUserResult
+import ru.gozerov.domain.models.login.GetCurrentUserResult
+import ru.gozerov.domain.models.login.GetLoginModeResult
 import ru.gozerov.domain.models.login.GetUsersResult
+import ru.gozerov.domain.models.login.GuestModeResult
+import ru.gozerov.domain.models.login.LoginMode
 import ru.gozerov.domain.models.login.LoginResult
 import ru.gozerov.domain.models.login.LoginWithoutPasswordResult
 import ru.gozerov.domain.models.login.SignUpResult
@@ -21,6 +25,11 @@ class LoginRepositoryImpl @Inject constructor(
     private val loginRemote: LoginRemote,
     private val userStorage: UserStorage
 ) : LoginRepository {
+
+    override suspend fun checkFirstRun(): Boolean = withContext(Dispatchers.IO) {
+        return@withContext userStorage.checkFirstRun()
+    }
+
     override suspend fun login(username: String, password: String): Flow<LoginResult> =
         withContext(Dispatchers.IO) {
             return@withContext flow<LoginResult> {
@@ -41,6 +50,21 @@ class LoginRepositoryImpl @Inject constructor(
                     }
             }
         }
+
+    override suspend fun guestMode(): Flow<GuestModeResult> = withContext(Dispatchers.IO) {
+        return@withContext flow {
+            userStorage.clearAccessToken()
+            emit(GuestModeResult.Success)
+        }
+    }
+
+    override suspend fun getLoginMode(): Flow<GetLoginModeResult> = withContext(Dispatchers.IO) {
+        return@withContext flow {
+            userStorage.getCurrentAccessToken()?.let {
+                emit(GetLoginModeResult.Success(LoginMode.LOGGED))
+            } ?: emit(GetLoginModeResult.Success(LoginMode.GUEST))
+        }
+    }
 
     override suspend fun register(username: String, password: String): Flow<SignUpResult> =
         withContext(Dispatchers.IO) {
@@ -78,6 +102,19 @@ class LoginRepositoryImpl @Inject constructor(
                 .collect()
         }
     }
+
+    override suspend fun getCurrentUser(): Flow<GetCurrentUserResult> =
+        withContext(Dispatchers.IO) {
+            return@withContext flow<GetCurrentUserResult> {
+                val token = userStorage.getCurrentAccessToken()
+                token?.let {
+                    val user = userStorage.getUserByToken(token)
+                    user?.let {
+                        emit(GetCurrentUserResult.Success(user))
+                    }
+                } ?: emit(GetCurrentUserResult.Incognito)
+            }
+        }
 
     override suspend fun deleteUserByName(name: String): Flow<DeleteUserResult> =
         withContext(Dispatchers.IO) {

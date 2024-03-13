@@ -8,10 +8,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.gozerov.domain.models.login.GetLoginModeResult
 import ru.gozerov.domain.models.tags.CreateTagResult
 import ru.gozerov.domain.models.tags.DeleteLikeResult
 import ru.gozerov.domain.models.tags.GetTagsResult
 import ru.gozerov.domain.models.tags.LikeTagResult
+import ru.gozerov.domain.usecases.login.GetLoginMode
 import ru.gozerov.domain.usecases.tags.CreateTag
 import ru.gozerov.domain.usecases.tags.DeleteLike
 import ru.gozerov.domain.usecases.tags.GetTags
@@ -25,7 +27,8 @@ class TagMapViewModel @Inject constructor(
     private val getTags: GetTags,
     private val createTag: CreateTag,
     private val likeTag: LikeTag,
-    private val deleteLike: DeleteLike
+    private val deleteLike: DeleteLike,
+    private val getLoginMode: GetLoginMode
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<TagMapViewState>(TagMapViewState.None)
@@ -34,6 +37,7 @@ class TagMapViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            observeGetLoginModeResult()
             observeGetTagsResult()
             observeLikeTagResult()
             observeDeleteLikeTagResult()
@@ -44,6 +48,7 @@ class TagMapViewModel @Inject constructor(
     fun handleIntent(intent: TagMapIntent) {
         viewModelScope.launch {
             when (intent) {
+                is TagMapIntent.GetLoginMode -> getLoginMode.execute(Unit)
                 is TagMapIntent.LoadTags -> getTags.execute(Unit)
                 is TagMapIntent.LikeTag -> likeTag.execute(intent.tag.id)
                 is TagMapIntent.UnlikeTag -> deleteLike.execute(intent.tag)
@@ -109,6 +114,21 @@ class TagMapViewModel @Inject constructor(
                     }
 
                     is CreateTagResult.Error -> {
+                        _viewState.emit(TagMapViewState.Error())
+                    }
+                }
+            }
+        }
+    }
+
+    private fun CoroutineScope.observeGetLoginModeResult() {
+        launch {
+            getLoginMode.result.collect { result ->
+                when(result) {
+                    is GetLoginModeResult.Success -> {
+                        _viewState.emit(TagMapViewState.UpdateLoginMode(result.mode))
+                    }
+                    is GetLoginModeResult.Error -> {
                         _viewState.emit(TagMapViewState.Error())
                     }
                 }

@@ -46,6 +46,9 @@ fun ChooseAccountScreen(navController: NavController, viewModel: ChooseAccountVi
             onLoginInAnotherAccount = {
                 navController.navigate(route = Screen.Login.route)
             },
+            onGuestMode = {
+                viewModel.handleIntent(ChooseAccountIntent.LoginAsGuest())
+            },
             onItemClick = {
                 viewModel.handleIntent(ChooseAccountIntent.Login(it))
             },

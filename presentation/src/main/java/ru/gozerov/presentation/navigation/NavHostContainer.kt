@@ -17,11 +17,14 @@ import ru.gozerov.presentation.screens.shared.exitAnimation
 @Composable
 fun NavHostContainer(
     navController: NavHostController,
-    padding: PaddingValues
+    padding: PaddingValues,
+    isLoginNeeded: Boolean
 ) {
+    val startDestination =
+        if (isLoginNeeded) Screen.ChooseAccount.route else Screen.MainSection.route
     NavHost(
         navController = navController,
-        startDestination = Screen.ChooseAccount.route,
+        startDestination = startDestination,
         builder = {
             composable(
                 route = Screen.ChooseAccount.route,

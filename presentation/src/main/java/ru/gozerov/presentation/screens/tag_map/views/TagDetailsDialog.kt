@@ -33,6 +33,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
+import ru.gozerov.domain.models.login.LoginMode
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.R
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
@@ -41,6 +42,7 @@ import ru.gozerov.presentation.ui.theme.ITLabTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TagDetailsDialog(
+    loginModeState: MutableState<LoginMode>,
     tagState: MutableState<Tag?>,
     tagBottomSheetState: SheetState,
     onLikeClicked: (tag: Tag, isLikedState: MutableState<Boolean>) -> Unit,
@@ -54,7 +56,7 @@ fun TagDetailsDialog(
         sheetState = tagBottomSheetState,
     ) {
         tagState.value?.let {
-            TagDetailsCard(it, onLikeClicked)
+            TagDetailsCard(loginModeState, it, onLikeClicked)
         }
 
     }
@@ -62,6 +64,7 @@ fun TagDetailsDialog(
 
 @Composable
 private fun TagDetailsCard(
+    loginModeState: MutableState<LoginMode>,
     tag: Tag,
     onLikeClicked: (tag: Tag, isLikedState: MutableState<Boolean>) -> Unit
 ) {
@@ -142,7 +145,9 @@ private fun TagDetailsCard(
             IconButton(
                 modifier = Modifier.padding(end = 8.dp),
                 onClick = {
-                    onLikeClicked(tag, isFavoriteState)
+                    if (loginModeState.value == LoginMode.LOGGED) {
+                        onLikeClicked(tag, isFavoriteState)
+                    }
                 }
             ) {
                 Icon(

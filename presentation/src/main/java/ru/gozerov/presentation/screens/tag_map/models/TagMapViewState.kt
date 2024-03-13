@@ -1,5 +1,6 @@
 package ru.gozerov.presentation.screens.tag_map.models
 
+import ru.gozerov.domain.models.login.LoginMode
 import ru.gozerov.domain.models.tags.Tag
 
 sealed class TagMapViewState {
@@ -12,6 +13,10 @@ sealed class TagMapViewState {
 
     class UpdateChosenTag(
         val tag: Tag
+    ) : TagMapViewState()
+
+    class UpdateLoginMode(
+        val loginMode: LoginMode
     ) : TagMapViewState()
 
     class Error : TagMapViewState()

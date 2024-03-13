@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
+import ru.gozerov.domain.models.login.LoginMode
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.screens.tag_map.models.TagMapIntent
@@ -34,10 +35,17 @@ fun TagMapScreen(
     val tagListState: MutableState<List<Tag>> = remember { mutableStateOf(emptyList()) }
     val pickedTag: MutableState<Tag?> = remember { mutableStateOf(null) }
 
+    val loginModeState: MutableState<LoginMode> = remember { mutableStateOf(LoginMode.GUEST) }
+
     val moveCameraToUserState: MutableState<Point?> = remember { mutableStateOf(null) }
     val isSetupSystemBarsNeeded = remember { mutableStateOf(false) }
     val isPointAdding = remember { mutableStateOf(false) }
     val addingPoint: MutableState<PlacemarkMapObject?> = remember { mutableStateOf(null) }
+
+    LaunchedEffect(key1 = null) {
+        viewModel.handleIntent(TagMapIntent.GetLoginMode)
+        viewModel.handleIntent(TagMapIntent.LoadTags)
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -45,14 +53,10 @@ fun TagMapScreen(
             SnackbarHost(snackbarScopeState)
         }
     ) { contentPadding ->
-
-        LaunchedEffect(key1 = null) {
-            viewModel.handleIntent(TagMapIntent.LoadTags)
-        }
-
         TagMapView(
             contentPadding = contentPadding,
             mapViewState = mapViewState,
+            loginModeState = loginModeState,
             tagList = tagListState.value,
             pickedTag = pickedTag,
             moveCameraToUserState = moveCameraToUserState,
@@ -76,21 +80,25 @@ fun TagMapScreen(
                 viewModel.handleIntent(TagMapIntent.CreateTag(it))
             }
         )
+    }
 
-        when (viewState) {
-            is TagMapViewState.None -> {}
-            is TagMapViewState.TagsOnMap -> {
-                tagListState.value = viewState.tags
-            }
+    when (viewState) {
+        is TagMapViewState.None -> {}
+        is TagMapViewState.TagsOnMap -> {
+            tagListState.value = viewState.tags
+        }
 
-            is TagMapViewState.UpdateChosenTag -> {
-                pickedTag.value = viewState.tag
-            }
+        is TagMapViewState.UpdateChosenTag -> {
+            pickedTag.value = viewState.tag
+        }
 
-            is TagMapViewState.Error -> {
-                addingPoint.value?.let { placemarkObject ->
-                    mapViewState.value?.mapWindow?.map?.mapObjects?.remove(placemarkObject)
-                }
+        is TagMapViewState.UpdateLoginMode -> {
+            loginModeState.value = viewState.loginMode
+        }
+
+        is TagMapViewState.Error -> {
+            addingPoint.value?.let { placemarkObject ->
+                mapViewState.value?.mapWindow?.map?.mapObjects?.remove(placemarkObject)
             }
         }
     }

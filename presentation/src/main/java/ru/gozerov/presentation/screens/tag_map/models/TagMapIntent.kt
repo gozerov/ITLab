@@ -7,6 +7,8 @@ sealed class TagMapIntent {
 
     object LoadTags : TagMapIntent()
 
+    object GetLoginMode : TagMapIntent()
+
     class LikeTag(val tag: Tag) : TagMapIntent()
 
     class UnlikeTag(val tag: Tag) : TagMapIntent()

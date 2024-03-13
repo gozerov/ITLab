@@ -6,15 +6,21 @@ import ru.gozerov.domain.models.users.User
 
 interface UserStorage {
 
+    fun checkFirstRun(): Boolean
+
     fun getCurrentAccessToken(): String?
 
     fun saveAccessToken(token: String)
+
+    fun clearAccessToken()
 
     suspend fun isLoggedUserAuthor(tag: Tag): Boolean
 
     suspend fun saveUser(token: String, username: String)
 
     suspend fun getUsers(): Flow<List<User>>
+
+    suspend fun getUserByToken(token: String): User?
 
     suspend fun deleteUser(username: String)
 

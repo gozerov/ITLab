@@ -3,12 +3,14 @@ package ru.gozerov.presentation.navigation
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.screens.account.AccountScreen
+import ru.gozerov.presentation.screens.account.AccountViewModel
 import ru.gozerov.presentation.screens.shared.enterAnimation
 import ru.gozerov.presentation.screens.shared.exitAnimation
 import ru.gozerov.presentation.screens.tag_list.details.TagDetailsScreen
@@ -21,6 +23,7 @@ import ru.gozerov.presentation.screens.tag_map.TagMapViewModel
 @Composable
 fun BottomNavHostContainer(
     navController: NavHostController,
+    rootNavController: NavController,
     padding: PaddingValues
 ) {
     NavHost(
@@ -66,7 +69,8 @@ fun BottomNavHostContainer(
                 route = BottomNavBarItem.Account.route,
                 enterTransition = { enterAnimation() },
                 exitTransition = { exitAnimation() }) {
-                AccountScreen()
+                val accountViewModel = hiltViewModel<AccountViewModel>()
+                AccountScreen(accountViewModel, padding, rootNavController)
             }
         }
     )

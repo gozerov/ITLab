@@ -46,6 +46,7 @@ fun AccountsList(
     userList: MutableState<List<User>>,
     isListEmpty: Boolean,
     onLoginInAnotherAccount: () -> Unit,
+    onGuestMode: () -> Unit,
     onItemClick: (user: User) -> Unit,
     onCloseClick: (user: User) -> Unit
 ) {
@@ -88,19 +89,39 @@ fun AccountsList(
                     .weight(1f),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                Button(
-                    modifier = Modifier
-                        .padding(horizontal = 64.dp)
-                        .height(48.dp)
-                        .fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.actionColor),
-                    onClick = onLoginInAnotherAccount
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.login_in_another_account)
-                    )
+                Column {
+                    Button(
+                        modifier = Modifier
+                            .padding(horizontal = 64.dp)
+                            .height(48.dp)
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.controlColor),
+                        onClick = onGuestMode
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.guest_mode),
+                            color = ITLabTheme.colors.secondaryBackgroundText
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        modifier = Modifier
+                            .padding(horizontal = 64.dp)
+                            .height(48.dp)
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.actionColor),
+                        onClick = onLoginInAnotherAccount
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.login_in_another_account)
+                        )
+                    }
                 }
+
             }
         }
     }

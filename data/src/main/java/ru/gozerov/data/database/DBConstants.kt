@@ -8,4 +8,6 @@ object DBConstants {
 
     const val TAGS_TABLE_NAME = "tags"
 
+    const val IS_FIRST_RUN = "is_first_run"
+
 }
