@@ -12,4 +12,6 @@ sealed class TagDetailsIntent {
 
     class DeleteTag(val id: String) : TagDetailsIntent()
 
+    class SubscribeOnAuthor(val username: String, val subscribed: Boolean) : TagDetailsIntent()
+
 }

@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import ru.gozerov.data.login.cache.UserStorage
 import ru.gozerov.data.tags.cache.TagStorage
 import ru.gozerov.data.tags.remote.TagRemote
+import ru.gozerov.data.tags.remote.push.PushRemote
 import ru.gozerov.data.utils.ApiConstants.defaultOptions
 import ru.gozerov.data.utils.ApiConstants.imageOptions
 import ru.gozerov.domain.models.tags.CreateTagData
@@ -27,6 +28,7 @@ import javax.inject.Inject
 
 class TagRepositoryImpl @Inject constructor(
     private val tagRemote: TagRemote,
+    private val pushRemote: PushRemote,
     private val userStorage: UserStorage,
     private val tagStorage: TagStorage
 ) : TagRepository {
@@ -134,8 +136,10 @@ class TagRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             return@withContext flow<GetTagDetailsResult> {
                 val tag = tagStorage.getTagById(id)
+                val username = tag.user?.username
+                val isSubscribed = username?.let { userStorage.checkSubscription(username) }
                 val isLoggedUserAuthor = userStorage.isLoggedUserAuthor(tag)
-                emit(GetTagDetailsResult.Success(TagDetails(tag, isLoggedUserAuthor)))
+                emit(GetTagDetailsResult.Success(TagDetails(tag, isLoggedUserAuthor, isSubscribed)))
             }
         }
 
@@ -160,6 +164,10 @@ class TagRepositoryImpl @Inject constructor(
                     )
                     response
                         .onSuccess { tag ->
+                            val user = userStorage.getUserByToken(token)
+                            user?.let {
+                                pushRemote.sendPush(it.username)
+                            }
                             emit(CreateTagResult.Success(tag))
                         }
                         .onFailure {
@@ -208,7 +216,17 @@ class TagRepositoryImpl @Inject constructor(
                 response
                     .onSuccess { tag ->
                         val isLoggedUserAuthor = userStorage.isLoggedUserAuthor(tag)
-                        emit(LikeTagResult.Success(TagDetails(tag, isLoggedUserAuthor)))
+                        val username = tag.user?.username
+                        val isSubscribed = username?.let { userStorage.checkSubscription(username) }
+                        emit(
+                            LikeTagResult.Success(
+                                TagDetails(
+                                    tag,
+                                    isLoggedUserAuthor,
+                                    isSubscribed
+                                )
+                            )
+                        )
                     }
                     .onFailure {
                         emit(LikeTagResult.Error)
@@ -230,8 +248,17 @@ class TagRepositoryImpl @Inject constructor(
                                 likes = tag.likes - 1
                             )
                             val isLoggedUserAuthor = userStorage.isLoggedUserAuthor(newTag)
+                            val username = tag.user?.username
+                            val isSubscribed =
+                                username?.let { userStorage.checkSubscription(username) }
                             emit(
-                                DeleteLikeResult.Success(TagDetails(newTag, isLoggedUserAuthor))
+                                DeleteLikeResult.Success(
+                                    TagDetails(
+                                        newTag,
+                                        isLoggedUserAuthor,
+                                        isSubscribed
+                                    )
+                                )
                             )
                         }
                         .onFailure {

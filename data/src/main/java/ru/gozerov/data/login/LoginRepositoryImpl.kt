@@ -18,6 +18,7 @@ import ru.gozerov.domain.models.login.LoginMode
 import ru.gozerov.domain.models.login.LoginResult
 import ru.gozerov.domain.models.login.LoginWithoutPasswordResult
 import ru.gozerov.domain.models.login.SignUpResult
+import ru.gozerov.domain.models.login.SubscribeOnUserResult
 import ru.gozerov.domain.repositories.LoginRepository
 import javax.inject.Inject
 
@@ -129,6 +130,20 @@ class LoginRepositoryImpl @Inject constructor(
             return@withContext flow<LoginWithoutPasswordResult> {
                 userStorage.refreshActiveAccount(username)
                 emit(LoginWithoutPasswordResult.Success)
+            }
+        }
+
+    override suspend fun subscribeOnUser(username: String, isSubscribed: Boolean): Flow<SubscribeOnUserResult> =
+        withContext(Dispatchers.IO) {
+            return@withContext flow {
+                emit(
+                    SubscribeOnUserResult.Success(
+                        userStorage.subscribeOnUser(
+                            username,
+                            isSubscribed
+                        )
+                    )
+                )
             }
         }
 

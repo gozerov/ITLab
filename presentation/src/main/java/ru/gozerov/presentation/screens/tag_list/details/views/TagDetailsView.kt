@@ -2,8 +2,6 @@ package ru.gozerov.presentation.screens.tag_list.details.views
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,12 +11,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -37,33 +37,37 @@ import ru.gozerov.presentation.ui.theme.ITLabTheme
 fun TagDetailsView(
     tagDetails: TagDetails,
     isTagLiked: Boolean,
+    isSubscribedState: MutableState<Boolean?>,
     onTagClick: (tag: Tag) -> Unit,
-    onDeleteTagClick: (tag: Tag) -> Unit
+    onDeleteTagClick: (tag: Tag) -> Unit,
+    onSubscribeAuthor: (username: String) -> Unit
 ) {
+    val isSubscribed = isSubscribedState.value
+    val username = tagDetails.tag.user?.username
     Scaffold(
         modifier = Modifier
+            .padding(top = 16.dp)
             .fillMaxSize(),
         containerColor = ITLabTheme.colors.primaryBackground
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .scrollable(rememberScrollState(), Orientation.Vertical)
-                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            val imageSource = tagDetails?.tag?.image
+            val imageSource = tagDetails.tag.image
             if (imageSource != null) {
                 DefaultImage(
                     source = imageSource,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(400.dp)
+                        .padding(horizontal = 16.dp)
                 )
             } else {
                 Icon(
                     modifier = Modifier
                         .size(400.dp)
-                        .padding(32.dp),
+                        .padding(vertical = 32.dp, horizontal = 48.dp),
                     painter = painterResource(id = R.drawable.ic_blank_image),
                     tint = ITLabTheme.colors.secondaryBackground,
                     contentDescription = null
@@ -83,12 +87,14 @@ fun TagDetailsView(
                     )
                 }
                 Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     text = annotatedString,
                     color = ITLabTheme.colors.primaryText,
                 )
             }
             Spacer(Modifier.height(16.dp))
             Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 text = tagDetails.tag.description,
                 color = ITLabTheme.colors.primaryText,
             )
@@ -104,6 +110,7 @@ fun TagDetailsView(
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
                     .height(56.dp),
                 shape = RoundedCornerShape(16.dp),
                 border = likeBorderStroke,
@@ -121,6 +128,7 @@ fun TagDetailsView(
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
                         .height(56.dp),
                     shape = RoundedCornerShape(16.dp),
                     border = BorderStroke(2.dp, ITLabTheme.colors.controlColor),
@@ -133,22 +141,25 @@ fun TagDetailsView(
                         tint = ITLabTheme.colors.controlColor
                     )
                 }
-            }
-            else {
+            } else if (isSubscribed != null && username != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
                         .height(56.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.tintColor),
-                    onClick = { }
+                    onClick = {
+                        onSubscribeAuthor(username)
+                    }
                 ) {
                     Text(
-                        text = stringResource(id = R.string.subscribe_on_author),
+                        text = stringResource(id = if (isSubscribed) R.string.subscribed else R.string.subscribe_on_author),
                         color = ITLabTheme.colors.primaryText
                     )
                 }
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

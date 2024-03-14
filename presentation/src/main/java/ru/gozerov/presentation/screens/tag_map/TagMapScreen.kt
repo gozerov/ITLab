@@ -36,7 +36,6 @@ fun TagMapScreen(
     val pickedTag: MutableState<Tag?> = remember { mutableStateOf(null) }
 
     val loginModeState: MutableState<LoginMode> = remember { mutableStateOf(LoginMode.GUEST) }
-
     val moveCameraToUserState: MutableState<Point?> = remember { mutableStateOf(null) }
     val isSetupSystemBarsNeeded = remember { mutableStateOf(false) }
     val isPointAdding = remember { mutableStateOf(false) }
@@ -56,7 +55,6 @@ fun TagMapScreen(
         TagMapView(
             contentPadding = contentPadding,
             mapViewState = mapViewState,
-            loginModeState = loginModeState,
             tagList = tagListState.value,
             pickedTag = pickedTag,
             moveCameraToUserState = moveCameraToUserState,
@@ -70,11 +68,13 @@ fun TagMapScreen(
                 viewModel.handleIntent(TagMapIntent.LoadTags)
             },
             onLikeClicked = { tag, isLikedState ->
-                if (!isLikedState.value)
-                    viewModel.handleIntent(TagMapIntent.LikeTag(tag))
-                else
-                    viewModel.handleIntent(TagMapIntent.UnlikeTag(tag))
-                isLikedState.value = !isLikedState.value
+                if (loginModeState.value == LoginMode.LOGGED) {
+                    if (!isLikedState.value)
+                        viewModel.handleIntent(TagMapIntent.LikeTag(tag))
+                    else
+                        viewModel.handleIntent(TagMapIntent.UnlikeTag(tag))
+                    isLikedState.value = !isLikedState.value
+                }
             },
             onConfirmCreatingTag = {
                 viewModel.handleIntent(TagMapIntent.CreateTag(it))

@@ -29,4 +29,6 @@
     <string name="reset_filters">Сбросить фильтры</string>
     <string name="guest">Гость</string>
     <string name="guest_mode">Гостевой режим</string>
+    <string name="switch_account">Сменить аккаунт</string>
+    <string name="subscribed">Вы подписаны</string>
 </resources>

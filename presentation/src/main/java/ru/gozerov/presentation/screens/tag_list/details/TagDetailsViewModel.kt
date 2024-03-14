@@ -8,10 +8,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.gozerov.domain.models.login.GetLoginModeResult
+import ru.gozerov.domain.models.login.SubscribeOnUserData
+import ru.gozerov.domain.models.login.SubscribeOnUserResult
 import ru.gozerov.domain.models.tags.DeleteLikeResult
 import ru.gozerov.domain.models.tags.DeleteTagResult
 import ru.gozerov.domain.models.tags.GetTagDetailsResult
 import ru.gozerov.domain.models.tags.LikeTagResult
+import ru.gozerov.domain.usecases.login.GetLoginMode
+import ru.gozerov.domain.usecases.login.SubscribeOnUser
 import ru.gozerov.domain.usecases.tags.DeleteLike
 import ru.gozerov.domain.usecases.tags.DeleteTag
 import ru.gozerov.domain.usecases.tags.GetTagDetails
@@ -25,7 +30,9 @@ class TagDetailsViewModel @Inject constructor(
     private val likeTag: LikeTag,
     private val deleteLike: DeleteLike,
     private val deleteTag: DeleteTag,
-    private val getTagDetails: GetTagDetails
+    private val getTagDetails: GetTagDetails,
+    private val getLoginMode: GetLoginMode,
+    private val subscribeOnUser: SubscribeOnUser
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow<TagDetailsViewState>(TagDetailsViewState.None)
@@ -34,10 +41,12 @@ class TagDetailsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            observeGetLoginModeResult()
             observeGetTagDetailsResult()
             observeLikeTagResult()
             observeDeleteLikeResult()
             observeDeleteTagResult()
+            observeSubscribeOnUserResult()
         }
     }
 
@@ -48,6 +57,12 @@ class TagDetailsViewModel @Inject constructor(
                 is TagDetailsIntent.LikeTag -> likeTag.execute(intent.id)
                 is TagDetailsIntent.UnlikeTag -> deleteLike.execute(intent.tag)
                 is TagDetailsIntent.DeleteTag -> deleteTag.execute(intent.id)
+                is TagDetailsIntent.SubscribeOnAuthor -> subscribeOnUser.execute(
+                    SubscribeOnUserData(
+                        intent.username,
+                        intent.subscribed
+                    )
+                )
             }
         }
 
@@ -108,5 +123,36 @@ class TagDetailsViewModel @Inject constructor(
         }
     }
 
+    private fun CoroutineScope.observeGetLoginModeResult() {
+        launch {
+            getLoginMode.result.collect { result ->
+                when (result) {
+                    is GetLoginModeResult.Success -> {
+                        _viewState.emit(TagDetailsViewState.UpdateLoginMode(result.mode))
+                    }
+
+                    is GetLoginModeResult.Error -> {
+                        _viewState.emit(TagDetailsViewState.Error())
+                    }
+                }
+            }
+        }
+    }
+
+    private fun CoroutineScope.observeSubscribeOnUserResult() {
+        launch {
+            subscribeOnUser.result.collect { result ->
+                when (result) {
+                    is SubscribeOnUserResult.Success -> {
+                        _viewState.emit(TagDetailsViewState.UpdateSubscription(result.isSubscribed))
+                    }
+
+                    is SubscribeOnUserResult.Error -> {
+                        _viewState.emit(TagDetailsViewState.Error())
+                    }
+                }
+            }
+        }
+    }
 
 }

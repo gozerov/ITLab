@@ -9,6 +9,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import ru.gozerov.domain.models.login.LoginMode
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.domain.models.tags.TagDetails
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
@@ -35,6 +37,9 @@ fun TagDetailsScreen(
     SetupSystemBars()
     val currentTagDetails = remember { mutableStateOf<TagDetails?>(null) }
     val snackbarScopeState = remember { SnackbarHostState() }
+
+    val isSubscribedState = remember { mutableStateOf<Boolean?>(null) }
+    val loginModeState: MutableState<LoginMode> = remember { mutableStateOf(LoginMode.GUEST) }
     val viewState = viewModel.viewState.collectAsState().value
     var isTagLiked: Boolean by remember { mutableStateOf(tag.isLiked) }
 
@@ -56,15 +61,28 @@ fun TagDetailsScreen(
             TagDetailsView(
                 tagDetails = tagDetails,
                 isTagLiked = isTagLiked,
+                isSubscribedState = isSubscribedState,
                 onTagClick = {
-                    if (!it.isLiked)
-                        viewModel.handleIntent(TagDetailsIntent.LikeTag(it.id))
-                    else
-                        viewModel.handleIntent(TagDetailsIntent.UnlikeTag(it))
-                    isTagLiked = !isTagLiked
+                    if (loginModeState.value == LoginMode.LOGGED) {
+                        if (!it.isLiked)
+                            viewModel.handleIntent(TagDetailsIntent.LikeTag(it.id))
+                        else
+                            viewModel.handleIntent(TagDetailsIntent.UnlikeTag(it))
+                        isTagLiked = !isTagLiked
+                    }
                 },
                 onDeleteTagClick = {
                     viewModel.handleIntent(TagDetailsIntent.DeleteTag(it.id))
+                },
+                onSubscribeAuthor = { username ->
+                    isSubscribedState.value?.let { isSubscribed ->
+                        viewModel.handleIntent(
+                            TagDetailsIntent.SubscribeOnAuthor(
+                                username,
+                                isSubscribed
+                            )
+                        )
+                    }
                 }
             )
 
@@ -73,8 +91,17 @@ fun TagDetailsScreen(
     }
     when (viewState) {
         is TagDetailsViewState.None -> {}
+        is TagDetailsViewState.UpdateLoginMode -> {
+            loginModeState.value = viewState.loginMode
+        }
+
         is TagDetailsViewState.UpdatedTag -> {
             currentTagDetails.value = viewState.tagDetails
+            isSubscribedState.value = viewState.tagDetails.isSubscribed
+        }
+
+        is TagDetailsViewState.UpdateSubscription -> {
+            isSubscribedState.value = viewState.isSubscribed
         }
 
         is TagDetailsViewState.TagHasBeenDeleted -> {

@@ -14,6 +14,10 @@ interface UserStorage {
 
     fun clearAccessToken()
 
+    suspend fun subscribeOnUser(username: String, isSubscribed: Boolean): Boolean
+
+    suspend fun checkSubscription(username: String): Boolean
+
     suspend fun isLoggedUserAuthor(tag: Tag): Boolean
 
     suspend fun saveUser(token: String, username: String)

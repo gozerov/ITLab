@@ -3,8 +3,6 @@ package ru.gozerov.data.tags.remote
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.DELETE
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -77,12 +75,11 @@ interface TagApi {
     ): Result<List<TagResponseBody>>
 
     @Multipart
-    @FormUrlEncoded
     @POST("api/tags/")
     suspend fun createTag(
-        @Field("latitude") latitude: Double,
-        @Field("longitude") longitude: Double,
-        @Field("description") description: String,
+        @Part("latitude") latitude: RequestBody,
+        @Part("longitude") longitude: RequestBody,
+        @Part("description") description: RequestBody,
         @Part image: MultipartBody.Part? = null
     ): Result<TagResponseBody>
 

@@ -10,4 +10,6 @@ object DBConstants {
 
     const val IS_FIRST_RUN = "is_first_run"
 
+    const val KEY_SUBSCRIBED_USERS = "subscribed_users"
+
 }

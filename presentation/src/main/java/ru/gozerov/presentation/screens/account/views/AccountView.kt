@@ -68,11 +68,11 @@ fun AccountView(
                         .height(48.dp)
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.actionColor),
+                    colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.tintColor),
                     onClick = onLoginInAnotherAccount
                 ) {
                     Text(
-                        text = stringResource(id = R.string.login_in_another_account)
+                        text = stringResource(id = R.string.switch_account)
                     )
                 }
             }

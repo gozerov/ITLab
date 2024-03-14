@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -73,5 +74,9 @@ dependencies {
 
     //MapKit
     implementation("com.yandex.android:maps.mobile:4.4.0-lite")
+
+    //Firebase
+    implementation("com.google.firebase:firebase-inappmessaging-display:20.4.0")
+    implementation("com.google.firebase:firebase-messaging-ktx:23.4.1")
 
 }

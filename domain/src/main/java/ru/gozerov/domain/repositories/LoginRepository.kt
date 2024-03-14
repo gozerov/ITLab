@@ -9,6 +9,7 @@ import ru.gozerov.domain.models.login.GuestModeResult
 import ru.gozerov.domain.models.login.LoginResult
 import ru.gozerov.domain.models.login.LoginWithoutPasswordResult
 import ru.gozerov.domain.models.login.SignUpResult
+import ru.gozerov.domain.models.login.SubscribeOnUserResult
 
 interface LoginRepository : Repository {
 
@@ -29,5 +30,7 @@ interface LoginRepository : Repository {
     suspend fun deleteUserByName(name: String): Flow<DeleteUserResult>
 
     suspend fun loginWithoutPassword(username: String): Flow<LoginWithoutPasswordResult>
+
+    suspend fun subscribeOnUser(username: String, isSubscribed: Boolean): Flow<SubscribeOnUserResult>
 
 }

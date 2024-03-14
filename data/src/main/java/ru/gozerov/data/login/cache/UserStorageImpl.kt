@@ -1,6 +1,7 @@
 package ru.gozerov.data.login.cache
 
 import android.content.SharedPreferences
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.gozerov.data.database.DBConstants
@@ -17,14 +18,14 @@ class UserStorageImpl @Inject constructor(
 ) : UserStorage {
 
     override fun checkFirstRun(): Boolean {
-        if (sharedPreferences.getBoolean(DBConstants.IS_FIRST_RUN, true)) {
+        return if (sharedPreferences.getBoolean(DBConstants.IS_FIRST_RUN, true)) {
             sharedPreferences
                 .edit()
                 .putBoolean(DBConstants.IS_FIRST_RUN, false)
                 .apply()
-            return true
+            true
         } else
-            return false
+            false
     }
 
     override fun getCurrentAccessToken(): String? =
@@ -42,6 +43,39 @@ class UserStorageImpl @Inject constructor(
             .edit()
             .remove(ApiConstants.KEY_ACCESS_TOKEN)
             .apply()
+    }
+
+    override suspend fun subscribeOnUser(username: String, isSubscribed: Boolean): Boolean {
+        val users = sharedPreferences.getStringSet(DBConstants.KEY_SUBSCRIBED_USERS, emptySet())
+        val newUsers = users?.toMutableSet()
+        if (isSubscribed) {
+            newUsers?.remove(username)
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(username)
+            sharedPreferences
+                .edit()
+                .putStringSet(DBConstants.KEY_SUBSCRIBED_USERS, newUsers)
+                .apply()
+            return false
+        } else {
+            newUsers?.add(username)
+            FirebaseMessaging.getInstance().subscribeToTopic(username)
+            sharedPreferences
+                .edit()
+                .putStringSet(DBConstants.KEY_SUBSCRIBED_USERS, newUsers)
+                .apply()
+            return true
+        }
+    }
+
+    override suspend fun checkSubscription(username: String): Boolean {
+        val users = sharedPreferences.getStringSet(DBConstants.KEY_SUBSCRIBED_USERS, emptySet())
+        return if (!users.isNullOrEmpty()) {
+            val user = users.firstOrNull { it == username }
+            user?.let {
+                true
+            } ?: false
+        } else
+            false
     }
 
     override suspend fun isLoggedUserAuthor(tag: Tag): Boolean {

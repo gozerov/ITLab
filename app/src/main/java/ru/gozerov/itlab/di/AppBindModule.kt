@@ -14,6 +14,8 @@ import ru.gozerov.data.tags.cache.TagStorage
 import ru.gozerov.data.tags.cache.TagStorageImpl
 import ru.gozerov.data.tags.remote.TagRemote
 import ru.gozerov.data.tags.remote.TagRemoteImpl
+import ru.gozerov.data.tags.remote.push.PushRemote
+import ru.gozerov.data.tags.remote.push.PushRemoteImpl
 import ru.gozerov.domain.repositories.LoginRepository
 import ru.gozerov.domain.repositories.TagRepository
 import javax.inject.Singleton
@@ -45,5 +47,9 @@ interface AppBindModule {
     @Binds
     @Singleton
     fun bindTagStorageImplToTagStorage(tagStorageImpl: TagStorageImpl): TagStorage
+
+    @Binds
+    @Singleton
+    fun bindPushRemoteImplToPushRemote(pushRemoteImpl: PushRemoteImpl): PushRemote
 
 }

@@ -36,7 +36,6 @@ import com.yandex.mapkit.map.MapObjectTapListener
 import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
-import ru.gozerov.domain.models.login.LoginMode
 import ru.gozerov.domain.models.tags.CreateTagData
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.R
@@ -61,7 +60,6 @@ fun TagMapView(
     contentPadding: PaddingValues,
     mapViewState: MutableState<MapView?>,
     tagList: List<Tag>,
-    loginModeState: MutableState<LoginMode>,
     onLikeClicked: (tag: Tag, isLikedState: MutableState<Boolean>) -> Unit,
     pickedTag: MutableState<Tag?>,
     moveCameraToUserState: MutableState<Point?>,
@@ -192,7 +190,6 @@ fun TagMapView(
             pickedTag.value?.let {
                 isSetupSystemBarsNeeded.value = false
                 TagDetailsDialog(
-                    loginModeState = loginModeState,
                     tagState = pickedTag,
                     tagBottomSheetState = tagBottomSheetState,
                     onLikeClicked = onLikeClicked,

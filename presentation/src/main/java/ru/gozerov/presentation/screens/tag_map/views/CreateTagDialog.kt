@@ -22,7 +22,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,7 +32,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import ru.gozerov.domain.models.login.LoginMode
 import ru.gozerov.presentation.R
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
@@ -173,10 +171,8 @@ fun CreateTagDialog(
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.tintColor),
                         onClick = {
-                            imageUri.value?.let { uri ->
-                                onConfirm(textState.value, imageUri.value)
-                                onDismiss(true)
-                            }
+                            onConfirm(textState.value, imageUri.value)
+                            onDismiss(true)
                         }
                     ) {
                         Text(

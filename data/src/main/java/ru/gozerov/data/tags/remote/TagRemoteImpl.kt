@@ -51,7 +51,8 @@ class TagRemoteImpl @Inject constructor(
         return if (imageFilter == null)
             tagApi.getTagsByOrderAndUsername(username, defaultFilter).mapByDirection(isReversed)
         else
-            tagApi.getTagsByOptionsAndUsername(username, defaultFilter, imageFilter).mapByDirection(isReversed)
+            tagApi.getTagsByOptionsAndUsername(username, defaultFilter, imageFilter)
+                .mapByDirection(isReversed)
     }
 
     override suspend fun getTagsAuthorized(accessToken: String): Result<List<Tag>> {
@@ -93,7 +94,12 @@ class TagRemoteImpl @Inject constructor(
             tagApi.getTagsByOrderAndUsernameAuthorized(bearer, username, defaultFilter)
                 .mapByDirection(isReversed)
         else
-            tagApi.getTagsByOptionsAndUsernameAuthorized(bearer, username, defaultFilter, imageFilter)
+            tagApi.getTagsByOptionsAndUsernameAuthorized(
+                bearer,
+                username,
+                defaultFilter,
+                imageFilter
+            )
                 .mapByDirection(isReversed)
     }
 
@@ -103,7 +109,15 @@ class TagRemoteImpl @Inject constructor(
         description: String,
         imageUri: Uri?
     ): Result<Tag> {
-        return tagApi.createTag(latitude, longitude, description, getImagePart(imageUri))
+        val latitudeBody = latitude.toString().toRequestBody(MultipartBody.FORM)
+        val longitudeBody = longitude.toString().toRequestBody(MultipartBody.FORM)
+        val descriptionBody = description.toRequestBody(MultipartBody.FORM)
+        return tagApi.createTag(
+            latitudeBody,
+            longitudeBody,
+            descriptionBody,
+            getImagePart(imageUri)
+        )
             .map { it.toTag() }
     }
 
