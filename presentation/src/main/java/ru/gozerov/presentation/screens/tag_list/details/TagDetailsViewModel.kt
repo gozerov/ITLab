@@ -53,6 +53,7 @@ class TagDetailsViewModel @Inject constructor(
     fun handleIntent(intent: TagDetailsIntent) {
         viewModelScope.launch {
             when (intent) {
+                is TagDetailsIntent.GetLoginMode -> getLoginMode.execute(Unit)
                 is TagDetailsIntent.LoadTag -> getTagDetails.execute(intent.id)
                 is TagDetailsIntent.LikeTag -> likeTag.execute(intent.id)
                 is TagDetailsIntent.UnlikeTag -> deleteLike.execute(intent.tag)

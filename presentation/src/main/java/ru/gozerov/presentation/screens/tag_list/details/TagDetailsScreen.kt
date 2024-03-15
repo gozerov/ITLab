@@ -1,6 +1,7 @@
 package ru.gozerov.presentation.screens.tag_list.details
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -44,6 +45,7 @@ fun TagDetailsScreen(
     var isTagLiked: Boolean by remember { mutableStateOf(tag.isLiked) }
 
     LaunchedEffect(key1 = null) {
+        viewModel.handleIntent(TagDetailsIntent.GetLoginMode)
         viewModel.handleIntent(TagDetailsIntent.LoadTag(tag.id))
     }
 

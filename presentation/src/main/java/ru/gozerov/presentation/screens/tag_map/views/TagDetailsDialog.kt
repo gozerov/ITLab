@@ -100,8 +100,7 @@ private fun TagDetailsCard(
             ) {
                 SubcomposeAsyncImage(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
+                        .fillMaxWidth(),
                     contentScale = ContentScale.Crop,
                     model = it,
                     contentDescription = null,
@@ -109,6 +108,7 @@ private fun TagDetailsCard(
                         Image(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .height(300.dp)
                                 .clip(RoundedCornerShape(16.dp))
                                 .background(ITLabTheme.colors.secondaryBackground),
                             painter = it.painter,
