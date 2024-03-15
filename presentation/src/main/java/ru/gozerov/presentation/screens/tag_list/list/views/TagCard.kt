@@ -59,7 +59,7 @@ fun TagCard(tag: Tag, onTagClick: (tag: Tag) -> Unit) {
                 modifier = Modifier.size(48.dp),
                 painter = painterResource(id = R.drawable.ic_blank_image),
                 contentDescription = null,
-                tint = ITLabTheme.colors.primaryBackground
+                tint = ITLabTheme.colors.primaryText
             )
         }
         Spacer(modifier = Modifier.width(16.dp))

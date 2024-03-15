@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import ru.gozerov.presentation.R
+import ru.gozerov.presentation.screens.shared.RequestImageStorage
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @Composable
@@ -46,6 +47,13 @@ fun CreateTagDialog(
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
             imageUri.value = uri
         }
+    val launchStoragePermissionState = remember { mutableStateOf(false) }
+
+    if (launchStoragePermissionState.value) {
+        RequestImageStorage {
+            launcher.launch("image/*")
+        }
+    }
 
     val textState = remember { mutableStateOf("") }
     Dialog(
@@ -99,7 +107,8 @@ fun CreateTagDialog(
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.tintColor),
                     onClick = {
-                        launcher.launch("image/*")
+                        launchStoragePermissionState.value = false
+                        launchStoragePermissionState.value = true
                     }) {
                     Text(
                         text = stringResource(id = R.string.choose_file),
@@ -161,7 +170,8 @@ fun CreateTagDialog(
                         }
                     ) {
                         Text(
-                            text = stringResource(id = R.string.cancel)
+                            text = stringResource(id = R.string.cancel),
+                            color = ITLabTheme.colors.primaryText
                         )
                     }
                     Button(

@@ -88,7 +88,7 @@ fun FilterDialog(
                             },
                             colors = RadioButtonDefaults.colors(
                                 selectedColor = ITLabTheme.colors.tintColor,
-                                unselectedColor = ITLabTheme.colors.secondaryBackground
+                                unselectedColor = ITLabTheme.colors.primaryText
                             )
                         )
                         Text(
@@ -130,7 +130,7 @@ fun FilterDialog(
                             },
                             colors = RadioButtonDefaults.colors(
                                 selectedColor = ITLabTheme.colors.tintColor,
-                                unselectedColor = ITLabTheme.colors.secondaryBackground
+                                unselectedColor = ITLabTheme.colors.primaryText
                             )
                         )
                         Text(
@@ -162,7 +162,7 @@ fun FilterDialog(
                         .height(48.dp)
                         .fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.primaryBackground),
-                    border = BorderStroke(2.dp, ITLabTheme.colors.secondaryBackground),
+                    border = BorderStroke((1.5).dp, ITLabTheme.colors.primaryText),
                     onClick = {
                         onReset()
                     }) {

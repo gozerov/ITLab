@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
 import ru.gozerov.presentation.navigation.NavHostContainer
+import ru.gozerov.presentation.screens.shared.RequestNotifications
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @AndroidEntryPoint
@@ -30,6 +31,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewState = viewModel.viewState.collectAsState()
             val navController = rememberNavController()
+
+            RequestNotifications()
+            
             ITLabTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize()

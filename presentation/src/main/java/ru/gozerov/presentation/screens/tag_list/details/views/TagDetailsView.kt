@@ -69,7 +69,7 @@ fun TagDetailsView(
                         .size(400.dp)
                         .padding(vertical = 32.dp, horizontal = 48.dp),
                     painter = painterResource(id = R.drawable.ic_blank_image),
-                    tint = ITLabTheme.colors.secondaryBackground,
+                    tint = ITLabTheme.colors.primaryText,
                     contentDescription = null
                 )
             }
@@ -102,7 +102,7 @@ fun TagDetailsView(
             val likeButtonColor =
                 if (isTagLiked) ITLabTheme.colors.errorColor else ITLabTheme.colors.primaryBackground
             val likeIconColor =
-                if (isTagLiked) ITLabTheme.colors.primaryText else ITLabTheme.colors.errorColor
+                if (isTagLiked) ITLabTheme.colors.secondaryBackgroundText else ITLabTheme.colors.errorColor
             val likePainterResource =
                 if (isTagLiked) R.drawable.ic_like_full_24 else R.drawable.ic_like_border_24
             val likeBorderStroke =

@@ -101,7 +101,6 @@ fun LoginForm(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginTextField(
     textState: MutableState<String>,
@@ -131,6 +130,11 @@ fun LoginTextField(
             unfocusedIndicatorColor = ITLabTheme.colors.controlColor,
             cursorColor = ITLabTheme.colors.tintColor,
             focusedTextColor = ITLabTheme.colors.primaryText,
+            unfocusedTextColor = ITLabTheme.colors.primaryText,
+            disabledContainerColor = ITLabTheme.colors.primaryBackground,
+            disabledLabelColor = ITLabTheme.colors.secondaryText,
+            disabledIndicatorColor = ITLabTheme.colors.controlColor,
+            disabledTextColor = ITLabTheme.colors.controlColor
         )
     )
 }
@@ -160,12 +164,17 @@ fun PasswordTextField(
         colors = TextFieldDefaults.colors(
             focusedLabelColor = ITLabTheme.colors.tintColor,
             focusedContainerColor = ITLabTheme.colors.primaryBackground,
-            unfocusedContainerColor = ITLabTheme.colors.primaryBackground,
             focusedIndicatorColor = ITLabTheme.colors.tintColor,
-            unfocusedIndicatorColor = ITLabTheme.colors.controlColor,
-            cursorColor = ITLabTheme.colors.tintColor,
             focusedTextColor = ITLabTheme.colors.primaryText,
-            unfocusedLabelColor = ITLabTheme.colors.secondaryText
+            unfocusedLabelColor = ITLabTheme.colors.secondaryText,
+            unfocusedContainerColor = ITLabTheme.colors.primaryBackground,
+            unfocusedIndicatorColor = ITLabTheme.colors.controlColor,
+            unfocusedTextColor = ITLabTheme.colors.primaryText,
+            cursorColor = ITLabTheme.colors.tintColor,
+            disabledContainerColor = ITLabTheme.colors.primaryBackground,
+            disabledLabelColor = ITLabTheme.colors.secondaryText,
+            disabledIndicatorColor = ITLabTheme.colors.controlColor,
+            disabledTextColor = ITLabTheme.colors.controlColor
         ),
         visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -196,11 +205,15 @@ fun DefaultLoginButton(
             .fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         enabled = !isLoadingState.value,
-        colors = ButtonDefaults.buttonColors(containerColor = containerColor),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            disabledContainerColor = ITLabTheme.colors.secondaryText
+        ),
         onClick = onClick
     ) {
         Text(
-            text = stringResource(id = textRes)
+            text = stringResource(id = textRes),
+            color = ITLabTheme.colors.primaryText
         )
     }
 }
@@ -209,7 +222,7 @@ fun DefaultLoginButton(
 @Composable
 fun LoginForm_Preview() {
     val isLoading = remember { mutableStateOf(false) }
-    ITLabTheme {
+    ITLabTheme(darkTheme = true) {
         LoginForm(
             contentPadding = PaddingValues(0.dp),
             isLoadingState = isLoading,

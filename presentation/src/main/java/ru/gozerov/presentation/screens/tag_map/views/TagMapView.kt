@@ -39,8 +39,7 @@ import com.yandex.runtime.image.ImageProvider
 import ru.gozerov.domain.models.tags.CreateTagData
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.presentation.R
-import ru.gozerov.presentation.screens.shared.RequestCoarseLocation
-import ru.gozerov.presentation.screens.shared.RequestFineLocation
+import ru.gozerov.presentation.screens.shared.RequestLocation
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.screens.tag_map.models.TagData
 import ru.gozerov.presentation.ui.theme.ITLabTheme
@@ -235,8 +234,7 @@ private fun SetupMap(
         moveCameraToUserState.value = null
     }
 
-    RequestCoarseLocation()
-    RequestFineLocation {
+    RequestLocation {
         fusedLocationClient.getLocation { loc ->
             if (moveCameraToUserState.value == null)
                 moveCameraToUserState.value = Point(loc.latitude, loc.longitude)

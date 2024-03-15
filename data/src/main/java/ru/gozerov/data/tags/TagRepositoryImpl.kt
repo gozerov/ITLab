@@ -2,6 +2,7 @@ package ru.gozerov.data.tags
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import ru.gozerov.data.login.cache.UserStorage
@@ -44,7 +45,7 @@ class TagRepositoryImpl @Inject constructor(
                         tagStorage.insertTags(tags)
                     }
                     .onFailure {
-                        emit(GetTagsResult.Error)
+                        loadCacheTags()
                     }
             } else {
                 val response = tagRemote.getTags()
@@ -54,7 +55,7 @@ class TagRepositoryImpl @Inject constructor(
                         tagStorage.insertTags(tags)
                     }
                     .onFailure {
-                        emit(GetTagsResult.Error)
+                        loadCacheTags()
                     }
             }
         }
@@ -76,7 +77,7 @@ class TagRepositoryImpl @Inject constructor(
                             tagStorage.insertTags(tags)
                         }
                         .onFailure {
-                            emit(GetTagsResult.Error)
+                            loadCacheTags()
                         }
                 } else {
                     val response = tagRemote.getTagsByOption(
@@ -89,7 +90,7 @@ class TagRepositoryImpl @Inject constructor(
                             tagStorage.insertTags(tags)
                         }
                         .onFailure {
-                            emit(GetTagsResult.Error)
+                            loadCacheTags()
                         }
                 }
             }
@@ -112,7 +113,7 @@ class TagRepositoryImpl @Inject constructor(
                             tagStorage.insertTags(tags)
                         }
                         .onFailure {
-                            emit(GetTagsResult.Error)
+                            loadCacheTags()
                         }
                 } else {
                     val response = tagRemote.getTagsByOptionAndUser(
@@ -126,7 +127,7 @@ class TagRepositoryImpl @Inject constructor(
                             tagStorage.insertTags(tags)
                         }
                         .onFailure {
-                            emit(GetTagsResult.Error)
+                            loadCacheTags()
                         }
                 }
             }
@@ -267,5 +268,13 @@ class TagRepositoryImpl @Inject constructor(
                 } ?: emit(DeleteLikeResult.Error)
             }
         }
+
+    private suspend fun FlowCollector<GetTagsResult>.loadCacheTags() {
+        val tags = tagStorage.getTags()
+        if (tags.isNotEmpty())
+            emit(GetTagsResult.Success(tags))
+        else
+            emit(GetTagsResult.Error)
+    }
 
 }
