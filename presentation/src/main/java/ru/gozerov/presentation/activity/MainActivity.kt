@@ -1,6 +1,5 @@
 package ru.gozerov.presentation.activity
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,6 +15,7 @@ import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
 import ru.gozerov.presentation.navigation.NavHostContainer
 import ru.gozerov.presentation.screens.shared.RequestNotifications
+import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
 @AndroidEntryPoint
@@ -23,7 +23,6 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: MainActivityViewModel by viewModels()
 
-    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MapKitFactory.initialize(this)
@@ -31,10 +30,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewState = viewModel.viewState.collectAsState()
             val navController = rememberNavController()
-
             RequestNotifications()
-            
+
             ITLabTheme {
+                SetupSystemBars()
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {

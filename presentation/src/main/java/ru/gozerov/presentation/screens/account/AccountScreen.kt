@@ -22,6 +22,7 @@ import ru.gozerov.presentation.navigation.Screen
 import ru.gozerov.presentation.screens.account.models.AccountIntent
 import ru.gozerov.presentation.screens.account.models.AccountViewState
 import ru.gozerov.presentation.screens.account.views.AccountView
+import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.screens.shared.showError
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -41,6 +42,8 @@ fun AccountScreen(
     LaunchedEffect(key1 = null) {
         viewModel.handleIntent(AccountIntent.LoadUser)
     }
+
+    SetupSystemBars()
 
     Scaffold(
         modifier = Modifier

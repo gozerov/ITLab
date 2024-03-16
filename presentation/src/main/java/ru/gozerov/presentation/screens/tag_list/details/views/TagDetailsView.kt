@@ -156,7 +156,7 @@ fun TagDetailsView(
                 ) {
                     Text(
                         text = stringResource(id = if (isSubscribed) R.string.subscribed else R.string.subscribe_on_author),
-                        color = ITLabTheme.colors.primaryText
+                        color = ITLabTheme.colors.secondaryBackgroundText
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))

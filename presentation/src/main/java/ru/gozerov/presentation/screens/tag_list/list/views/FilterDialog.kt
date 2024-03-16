@@ -152,7 +152,7 @@ fun FilterDialog(
                     }) {
                     Text(
                         text = stringResource(id = R.string.confirm),
-                        color = ITLabTheme.colors.primaryText
+                        color = ITLabTheme.colors.secondaryBackgroundText
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))

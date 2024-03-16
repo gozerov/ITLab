@@ -112,7 +112,7 @@ fun CreateTagDialog(
                     }) {
                     Text(
                         text = stringResource(id = R.string.choose_file),
-                        color = ITLabTheme.colors.primaryText,
+                        color = ITLabTheme.colors.secondaryBackgroundText,
                         style = ITLabTheme.typography.caption
                     )
                 }
@@ -189,7 +189,7 @@ fun CreateTagDialog(
                     ) {
                         Text(
                             text = stringResource(id = R.string.create),
-                            color = ITLabTheme.colors.primaryText
+                            color = ITLabTheme.colors.secondaryBackgroundText
                         )
                     }
                 }

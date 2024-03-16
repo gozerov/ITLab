@@ -213,7 +213,7 @@ fun DefaultLoginButton(
     ) {
         Text(
             text = stringResource(id = textRes),
-            color = ITLabTheme.colors.primaryText
+            color = ITLabTheme.colors.secondaryBackgroundText
         )
     }
 }
