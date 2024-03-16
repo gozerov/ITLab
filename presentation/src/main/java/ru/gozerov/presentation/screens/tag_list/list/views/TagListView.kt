@@ -43,7 +43,7 @@ fun TagListView(
     selectedDefaultOption: MutableState<String>,
     selectedImageOption: MutableState<String>,
     onResetFilters: () -> Unit,
-    onConfirmFilters: (String, String) -> Unit
+    onConfirmFilters: () -> Unit
 ) {
     val isFilterDialogVisible = remember { mutableStateOf(false) }
     Scaffold(
@@ -95,9 +95,9 @@ fun TagListView(
                 imageOptions = imageOptions,
                 selectedDefaultOption = selectedDefaultOption,
                 selectedImageOption = selectedImageOption,
-                onConfirm = { defaultOption, imageOption ->
+                onConfirm = {
                     isFilterDialogVisible.value = false
-                    onConfirmFilters(defaultOption, imageOption)
+                    onConfirmFilters()
                 },
                 onDismiss = {
                     isFilterDialogVisible.value = false

@@ -25,13 +25,14 @@ fun LoginScreen(
     viewModel: LoginViewModel
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val snackbarScopeState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val isLoadingState = remember { mutableStateOf(false) }
     val viewState = viewModel.viewState.collectAsState().value
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = {
-            SnackbarHost(snackbarScopeState)
+            SnackbarHost(snackbarHostState)
         }
     ) { contentPadding ->
         LoginForm(
@@ -56,7 +57,7 @@ fun LoginScreen(
             }
 
             is LoginViewState.BadCredentialsError -> {
-                snackbarScopeState.showError(
+                snackbarHostState.showError(
                     coroutineScope = coroutineScope,
                     isLoadingState = isLoadingState,
                     message = stringResource(id = R.string.bad_credentials)
@@ -64,7 +65,7 @@ fun LoginScreen(
             }
 
             is LoginViewState.AccountExistsError -> {
-                snackbarScopeState.showError(
+                snackbarHostState.showError(
                     coroutineScope = coroutineScope,
                     isLoadingState = isLoadingState,
                     message = stringResource(id = R.string.account_exists)
@@ -72,7 +73,7 @@ fun LoginScreen(
             }
 
             is LoginViewState.UnknownError -> {
-                snackbarScopeState.showError(
+                snackbarHostState.showError(
                     coroutineScope = coroutineScope,
                     isLoadingState = isLoadingState,
                     message = stringResource(id = R.string.unknown_error)

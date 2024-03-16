@@ -36,7 +36,7 @@ fun FilterDialog(
     imageOptions: List<String>,
     selectedDefaultOption: MutableState<String>,
     selectedImageOption: MutableState<String>,
-    onConfirm: (String, String) -> Unit,
+    onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     onReset: () -> Unit
 ) {
@@ -148,7 +148,7 @@ fun FilterDialog(
                         .fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.tintColor),
                     onClick = {
-                        onConfirm(selectedDefaultOption.value, selectedImageOption.value)
+                        onConfirm()
                     }) {
                     Text(
                         text = stringResource(id = R.string.confirm),

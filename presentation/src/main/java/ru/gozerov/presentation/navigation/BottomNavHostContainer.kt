@@ -36,7 +36,7 @@ fun BottomNavHostContainer(
                 exitTransition = { exitAnimation() }
             ) {
                 val tagMapViewModel = hiltViewModel<TagMapViewModel>()
-                TagMapScreen(tagMapViewModel)
+                TagMapScreen(tagMapViewModel, padding)
             }
             navigation(Screen.TagList.route, BottomNavBarItem.TagListFlow.route) {
                 composable(

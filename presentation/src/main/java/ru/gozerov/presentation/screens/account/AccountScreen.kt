@@ -5,18 +5,24 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import ru.gozerov.domain.models.users.User
+import ru.gozerov.presentation.R
 import ru.gozerov.presentation.navigation.Screen
 import ru.gozerov.presentation.screens.account.models.AccountIntent
 import ru.gozerov.presentation.screens.account.models.AccountViewState
 import ru.gozerov.presentation.screens.account.views.AccountView
+import ru.gozerov.presentation.screens.shared.showError
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -29,6 +35,9 @@ fun AccountScreen(
     val currentUser = remember { mutableStateOf<User?>(null) }
     val isGuestMode = remember { mutableStateOf(false) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(key1 = null) {
         viewModel.handleIntent(AccountIntent.LoadUser)
     }
@@ -36,7 +45,10 @@ fun AccountScreen(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .padding(paddingValues)
+            .padding(paddingValues),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }
     ) { contentPadding ->
         AccountView(
             user = currentUser.value,
@@ -59,7 +71,10 @@ fun AccountScreen(
         }
 
         is AccountViewState.Error -> {
-
+            snackbarHostState.showError(
+                coroutineScope = coroutineScope,
+                message = stringResource(id = R.string.unknown_error)
+            )
         }
     }
 }

@@ -1,7 +1,6 @@
 package ru.gozerov.presentation.screens.tag_list.details
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,18 +9,21 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import ru.gozerov.domain.models.login.LoginMode
 import ru.gozerov.domain.models.tags.Tag
 import ru.gozerov.domain.models.tags.TagDetails
+import ru.gozerov.presentation.R
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
+import ru.gozerov.presentation.screens.shared.showError
 import ru.gozerov.presentation.screens.tag_list.details.models.TagDetailsIntent
 import ru.gozerov.presentation.screens.tag_list.details.models.TagDetailsViewState
 import ru.gozerov.presentation.screens.tag_list.details.views.TagDetailsView
@@ -37,10 +39,11 @@ fun TagDetailsScreen(
 ) {
     SetupSystemBars()
     val currentTagDetails = remember { mutableStateOf<TagDetails?>(null) }
-    val snackbarScopeState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     val isSubscribedState = remember { mutableStateOf<Boolean?>(null) }
-    val loginModeState: MutableState<LoginMode> = remember { mutableStateOf(LoginMode.GUEST) }
+    val loginModeState = viewModel.loginMode.collectAsState()
     val viewState = viewModel.viewState.collectAsState().value
     var isTagLiked: Boolean by remember { mutableStateOf(tag.isLiked) }
 
@@ -55,16 +58,16 @@ fun TagDetailsScreen(
             .padding(paddingValues),
         containerColor = ITLabTheme.colors.primaryBackground,
         snackbarHost = {
-            SnackbarHost(snackbarScopeState)
+            SnackbarHost(snackbarHostState)
         }
-    ) { contentPadding ->
+    ) { _ ->
         val tagDetails = currentTagDetails.value
         if (tagDetails != null) {
             TagDetailsView(
                 tagDetails = tagDetails,
                 isTagLiked = isTagLiked,
                 isSubscribedState = isSubscribedState,
-                onTagClick = {
+                onLikeClick = {
                     if (loginModeState.value == LoginMode.LOGGED) {
                         if (!it.isLiked)
                             viewModel.handleIntent(TagDetailsIntent.LikeTag(it.id))
@@ -93,9 +96,6 @@ fun TagDetailsScreen(
     }
     when (viewState) {
         is TagDetailsViewState.None -> {}
-        is TagDetailsViewState.UpdateLoginMode -> {
-            loginModeState.value = viewState.loginMode
-        }
 
         is TagDetailsViewState.UpdatedTag -> {
             currentTagDetails.value = viewState.tagDetails
@@ -111,7 +111,10 @@ fun TagDetailsScreen(
         }
 
         is TagDetailsViewState.Error -> {
-
+            snackbarHostState.showError(
+                coroutineScope = coroutineScope,
+                message = stringResource(id = R.string.unknown_error)
+            )
         }
     }
 

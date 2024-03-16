@@ -181,8 +181,10 @@ fun CreateTagDialog(
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = ITLabTheme.colors.tintColor),
                         onClick = {
-                            onConfirm(textState.value, imageUri.value)
-                            onDismiss(true)
+                            if (textState.value.isNotEmpty()) {
+                                onConfirm(textState.value, imageUri.value)
+                                onDismiss(true)
+                            }
                         }
                     ) {
                         Text(

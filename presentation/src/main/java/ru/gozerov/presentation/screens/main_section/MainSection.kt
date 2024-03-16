@@ -21,6 +21,7 @@ fun MainSection(rootNavController: NavHostController, contentPaddingValues: Padd
         BottomNavHostContainer(
             navController = navController,
             rootNavController = rootNavController,
-            padding = contentPadding)
+            padding = contentPadding
+        )
     }
 }

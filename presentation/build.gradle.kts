@@ -33,7 +33,6 @@ android {
         jvmTarget = "1.8"
     }
     buildFeatures {
-        viewBinding = true
         compose = true
     }
     composeOptions {
@@ -55,12 +54,6 @@ dependencies {
     //Hilt
     implementation ("com.google.dagger:hilt-android:2.48.1")
     kapt("com.google.dagger:hilt-android-compiler:2.48.1")
-
-    //retrofit & OKHttp
-    implementation("com.squareup.retrofit2:retrofit:2.8.1")
-    implementation("com.squareup.retrofit2:converter-moshi:2.8.1")
-    implementation(platform("com.squareup.okhttp3:okhttp-bom:4.10.0"))
-    implementation("com.squareup.okhttp3:okhttp")
 
     //MapKit
     implementation("com.yandex.android:maps.mobile:4.4.0-lite")

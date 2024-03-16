@@ -12,12 +12,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import ru.gozerov.domain.models.tags.Tag
+import ru.gozerov.presentation.R
 import ru.gozerov.presentation.navigation.Screen
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
+import ru.gozerov.presentation.screens.shared.showError
 import ru.gozerov.presentation.screens.tag_list.list.models.TagListIntent
 import ru.gozerov.presentation.screens.tag_list.list.models.TagListViewState
 import ru.gozerov.presentation.screens.tag_list.list.views.TagListView
@@ -39,7 +43,9 @@ fun TagListScreen(
 
     SetupSystemBars()
     val tagState = remember { mutableStateOf<List<Tag>>(emptyList()) }
-    val snackbarScopeState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
     val viewState = viewModel.viewState.collectAsState().value
 
     LaunchedEffect(key1 = null) {
@@ -69,9 +75,9 @@ fun TagListScreen(
             .padding(paddingValues),
         containerColor = ITLabTheme.colors.primaryBackground,
         snackbarHost = {
-            SnackbarHost(snackbarScopeState)
+            SnackbarHost(snackbarHostState)
         }
-    ) { contentPadding ->
+    ) { _ ->
 
         TagListView(
             tagList = tagState.value,
@@ -105,7 +111,7 @@ fun TagListScreen(
             imageOptions = imageOptions.value,
             selectedDefaultOption = selectedDefaultOption,
             selectedImageOption = selectedImageOption,
-            onConfirmFilters = { defaultOption, imageOption ->
+            onConfirmFilters = {
                 if (searchFieldState.value.isBlank()) {
                     viewModel.handleIntent(
                         TagListIntent.LoadTagsByFilters(
@@ -158,7 +164,10 @@ fun TagListScreen(
         }
 
         is TagListViewState.Error -> {
-
+            snackbarHostState.showError(
+                coroutineScope = coroutineScope,
+                message = stringResource(id = R.string.unknown_error)
+            )
         }
     }
 }

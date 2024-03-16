@@ -1,6 +1,7 @@
 package ru.gozerov.presentation.screens.tag_map.views
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -13,11 +14,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -57,6 +62,7 @@ private val mapObjectTapListener = MapObjectTapListener { mapObject, _ ->
 @Composable
 fun TagMapView(
     contentPadding: PaddingValues,
+    snackbarHostState: SnackbarHostState,
     mapViewState: MutableState<MapView?>,
     tagList: List<Tag>,
     onLikeClicked: (tag: Tag, isLikedState: MutableState<Boolean>) -> Unit,
@@ -74,6 +80,8 @@ fun TagMapView(
 
     val tagBottomSheetState = rememberModalBottomSheetState()
     val isDarkMode = isSystemInDarkTheme()
+
+    val userPlacemarkState = remember { mutableStateOf<PlacemarkMapObject?>(null) }
 
     LaunchedEffect(key1 = null) {
         mapViewState.value?.mapWindow?.map?.isNightModeEnabled = isDarkMode
@@ -105,13 +113,23 @@ fun TagMapView(
     if (isSetupSystemBarsNeeded.value)
         SetupSystemBars(Color.Transparent)
 
-    SetupMap(moveCameraToUserState, mapViewState, fusedLocationClient, inputListener)
+    SetupMap(
+        moveCameraToUserState,
+        mapViewState,
+        fusedLocationClient,
+        inputListener,
+        userPlacemarkState,
+        context
+    )
     SetupSystemBars(Color.Transparent)
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .padding(bottom = contentPadding.calculateBottomPadding())
-            .background(ITLabTheme.colors.primaryBackground)
+            .background(ITLabTheme.colors.primaryBackground),
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        }
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -173,6 +191,19 @@ fun TagMapView(
                 ) {
                     fusedLocationClient.getLocation { loc ->
                         moveCameraToUserState.value = Point(loc.latitude, loc.longitude)
+                        userPlacemarkState.value?.let {
+                            mapViewState.value?.mapWindow?.map?.mapObjects?.remove(it)
+                        }
+                        userPlacemarkState.value =
+                            mapViewState.value?.mapWindow?.map?.mapObjects?.addPlacemark {
+                                it.geometry = Point(loc.latitude, loc.longitude)
+                                it.setIcon(
+                                    ImageProvider.fromResource(
+                                        context,
+                                        R.drawable.ic_user_location_24
+                                    )
+                                )
+                            }
                     }
                 }
 
@@ -227,7 +258,9 @@ private fun SetupMap(
     moveCameraToUserState: MutableState<Point?>,
     mapViewState: MutableState<MapView?>,
     fusedLocationClient: FusedLocationProviderClient,
-    inputListener: InputListener
+    inputListener: InputListener,
+    userPlacemarkState: MutableState<PlacemarkMapObject?>,
+    context: Context
 ) {
     moveCameraToUserState.value?.let { point ->
         mapViewState.value.moveCamera(point = point, zoom = 16f)
@@ -236,8 +269,22 @@ private fun SetupMap(
 
     RequestLocation {
         fusedLocationClient.getLocation { loc ->
-            if (moveCameraToUserState.value == null)
+            if (moveCameraToUserState.value == null) {
                 moveCameraToUserState.value = Point(loc.latitude, loc.longitude)
+                userPlacemarkState.value?.let {
+                    mapViewState.value?.mapWindow?.map?.mapObjects?.remove(it)
+                }
+                userPlacemarkState.value =
+                    mapViewState.value?.mapWindow?.map?.mapObjects?.addPlacemark {
+                        it.geometry = Point(loc.latitude, loc.longitude)
+                        it.setIcon(
+                            ImageProvider.fromResource(
+                                context,
+                                R.drawable.ic_user_location_24
+                            )
+                        )
+                    }
+            }
         }
     }
 

@@ -38,7 +38,7 @@ fun TagDetailsView(
     tagDetails: TagDetails,
     isTagLiked: Boolean,
     isSubscribedState: MutableState<Boolean?>,
-    onTagClick: (tag: Tag) -> Unit,
+    onLikeClick: (tag: Tag) -> Unit,
     onDeleteTagClick: (tag: Tag) -> Unit,
     onSubscribeAuthor: (username: String) -> Unit
 ) {
@@ -115,7 +115,7 @@ fun TagDetailsView(
                 shape = RoundedCornerShape(16.dp),
                 border = likeBorderStroke,
                 colors = ButtonDefaults.buttonColors(containerColor = likeButtonColor),
-                onClick = { onTagClick(tagDetails.tag) }
+                onClick = { onLikeClick(tagDetails.tag) }
             ) {
                 Icon(
                     painter = painterResource(likePainterResource),

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.gozerov.domain.models.login.GetLoginModeResult
+import ru.gozerov.domain.models.login.LoginMode
 import ru.gozerov.domain.models.login.SubscribeOnUserData
 import ru.gozerov.domain.models.login.SubscribeOnUserResult
 import ru.gozerov.domain.models.tags.DeleteLikeResult
@@ -39,6 +40,10 @@ class TagDetailsViewModel @Inject constructor(
     val viewState: StateFlow<TagDetailsViewState>
         get() = _viewState.asStateFlow()
 
+    private val _loginMode = MutableStateFlow(LoginMode.GUEST)
+    val loginMode: StateFlow<LoginMode>
+        get() = _loginMode.asStateFlow()
+
     init {
         viewModelScope.launch {
             observeGetLoginModeResult()
@@ -55,6 +60,7 @@ class TagDetailsViewModel @Inject constructor(
             when (intent) {
                 is TagDetailsIntent.GetLoginMode -> getLoginMode.execute(Unit)
                 is TagDetailsIntent.LoadTag -> getTagDetails.execute(intent.id)
+
                 is TagDetailsIntent.LikeTag -> likeTag.execute(intent.id)
                 is TagDetailsIntent.UnlikeTag -> deleteLike.execute(intent.tag)
                 is TagDetailsIntent.DeleteTag -> deleteTag.execute(intent.id)
@@ -129,7 +135,7 @@ class TagDetailsViewModel @Inject constructor(
             getLoginMode.result.collect { result ->
                 when (result) {
                     is GetLoginModeResult.Success -> {
-                        _viewState.emit(TagDetailsViewState.UpdateLoginMode(result.mode))
+                        _loginMode.emit(result.mode)
                     }
 
                     is GetLoginModeResult.Error -> {

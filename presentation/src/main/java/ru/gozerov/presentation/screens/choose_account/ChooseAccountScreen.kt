@@ -26,13 +26,13 @@ import ru.gozerov.presentation.screens.shared.showError
 @Composable
 fun ChooseAccountScreen(navController: NavController, viewModel: ChooseAccountViewModel) {
     val coroutineScope = rememberCoroutineScope()
-    val snackbarScopeState = remember { SnackbarHostState() }
+    val snackbarHostState = remember { SnackbarHostState() }
     var isListEmptyState by remember { mutableStateOf(false) }
     val viewState = viewModel.viewState.collectAsState().value
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = {
-            SnackbarHost(snackbarScopeState)
+            SnackbarHost(snackbarHostState)
         }
     ) { contentPadding ->
         val userList = remember { mutableStateOf<List<User>>(emptyList()) }
@@ -68,12 +68,14 @@ fun ChooseAccountScreen(navController: NavController, viewModel: ChooseAccountVi
             }
 
             is ChooseAccountViewState.SuccessLogin -> {
-                navController.navigate(Screen.MainSection.route)
+                navController.navigate(Screen.MainSection.route) {
+                    popUpTo(0)
+                }
                 viewModel.handleIntent(ChooseAccountIntent.ExitScreen)
             }
 
             is ChooseAccountViewState.Error -> {
-                snackbarScopeState.showError(
+                snackbarHostState.showError(
                     coroutineScope = coroutineScope,
                     message = stringResource(id = R.string.unknown_error)
                 )

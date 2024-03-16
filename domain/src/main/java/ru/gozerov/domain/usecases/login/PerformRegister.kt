@@ -1,9 +1,6 @@
 package ru.gozerov.domain.usecases.login
 
 import kotlinx.coroutines.flow.Flow
-import org.json.JSONException
-import org.json.JSONObject
-import retrofit2.HttpException
 import ru.gozerov.domain.models.login.LoginData
 import ru.gozerov.domain.models.login.SignUpResult
 import ru.gozerov.domain.repositories.LoginRepository

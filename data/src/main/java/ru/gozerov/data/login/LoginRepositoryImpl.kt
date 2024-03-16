@@ -133,7 +133,10 @@ class LoginRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun subscribeOnUser(username: String, isSubscribed: Boolean): Flow<SubscribeOnUserResult> =
+    override suspend fun subscribeOnUser(
+        username: String,
+        isSubscribed: Boolean
+    ): Flow<SubscribeOnUserResult> =
         withContext(Dispatchers.IO) {
             return@withContext flow {
                 emit(

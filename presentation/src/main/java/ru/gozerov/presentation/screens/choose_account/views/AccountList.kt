@@ -39,7 +39,6 @@ import ru.gozerov.presentation.R
 import ru.gozerov.presentation.screens.shared.SetupSystemBars
 import ru.gozerov.presentation.ui.theme.ITLabTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountsList(
     contentPadding: PaddingValues,
@@ -81,7 +80,10 @@ fun AccountsList(
                     }
                 )
             } else {
-                Text(text = stringResource(R.string.no_accounts))
+                Text(
+                    text = stringResource(R.string.no_accounts),
+                    color = ITLabTheme.colors.primaryText
+                )
             }
             Box(
                 modifier = Modifier
